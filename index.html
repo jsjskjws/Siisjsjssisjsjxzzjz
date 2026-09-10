@@ -1,915 +1,458 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import {
-  Home, Radio, Bell, LayoutGrid, Clock, DollarSign, ListChecks, FileText,
-  UtensilsCrossed, MessageSquareWarning, ChevronLeft, ChevronRight,
-  ChevronDown, CreditCard, GraduationCap, Calendar, BookOpen,
-  AlignLeft, Star, Mountain, X, User, Landmark, MapPin,
-} from "lucide-react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Transilvania App</title>
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+    body {
+        background-color: #121212;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        -webkit-user-select: none;
+        user-select: none;
+        overflow-x: hidden;
+    }
+    .app-container {
+        width: 100%;
+        max-width: 400px;
+        background-color: #1a1a1a;
+        min-height: 100vh;
+        padding: env(safe-area-inset-top) 20px 80px 20px;
+        box-sizing: border-box;
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    /* PAGE ANIMATIONS */
+    .slide-in-right { animation: slideInRight 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+    .slide-in-left { animation: slideInLeft 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
-// ---------------------------------------------------------------------------
-// iOS-ish easing. Apple's own UINavigationController push curve is a custom
-// spring, but this cubic-bezier is the standard web approximation for it.
-// ---------------------------------------------------------------------------
-const IOS_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
-const PUSH_MS = 380;
-const SHEET_MS = 320;
+    @keyframes slideInRight {
+        0% { transform: translateX(100%); opacity: 0.5; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInLeft {
+        0% { transform: translateX(-30%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
 
-// ---------------------------------------------------------------------------
-// Sample data (stand-in academic data, styled after the flow shown in the
-// recording — course names/marks are placeholders, not real records)
-// ---------------------------------------------------------------------------
+    /* SHARED STYLES */
+    .icon-wrapper {
+        background-color: #1a1a1a; width: 40px; height: 40px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+    }
+    .icon-wrapper svg { width: 20px; height: 20px; fill: #fff; }
+    .dropdown-icon { color: #aaa; font-size: 14px; }
+    
+    .page-header { 
+        display: flex; align-items: center; justify-content: space-between; 
+        margin-top: 15px; margin-bottom: 25px; font-size: 20px; font-weight: 500; 
+    }
+    .back-btn { font-size: 26px; color: #fff; cursor: pointer; padding: 0 10px; margin-left: -10px; }
+    .header-dots { font-size: 24px; color: #aaa; margin-top: -8px; }
 
-const GRADES = {
-  "2025-2026": {
-    "Semester 2": [
-      { id: 1, badge: "AB", mark: "Absent", date: "10.09.2026", credits: 4, spec: "Automotive Engineering — English track", name: "Field Practice" },
-      { id: 2, badge: "AB", mark: "Absent", date: "09.09.2026", credits: 5, spec: "Automotive Engineering — English track", name: "Mechanisms" },
-      { id: 3, badge: "AB", mark: "Absent", date: "09.09.2026", credits: 4, spec: "Automotive Engineering — English track", name: "Fluid Mechanics & Hydraulic Machinery" },
-      { id: 4, badge: "AB", mark: "Absent", date: "07.09.2026", credits: 5, spec: "Automotive Engineering — English track", name: "Strength of Materials II" },
-      { id: 5, badge: "5",  mark: "5",       date: "03.07.2026", credits: 5, spec: "Automotive Engineering — English track", name: "Machine Elements I" },
-      { id: 6, badge: "AD", mark: "Absent",  date: "—",          credits: 1, spec: "Automotive Engineering — English track", name: "Physical Education IV" },
-      { id: 7, badge: "8",  mark: "8",       date: "28.06.2026", credits: 4, spec: "Automotive Engineering — English track", name: "Tolerances & Dimensional Control" },
-      { id: 8, badge: "9",  mark: "9",       date: "24.06.2026", credits: 5, spec: "Automotive Engineering — English track", name: "Fundamentals of Automotive Engineering" },
-      { id: 9, badge: "7",  mark: "7",       date: "20.06.2026", credits: 3, spec: "Automotive Engineering — English track", name: "French 4" },
-    ],
-    "Semester 1": [
-      { id: 10, badge: "AB", mark: "Absent", date: "—",          credits: 5, spec: "Automotive Engineering — English track", name: "Strength of Materials I" },
-      { id: 11, badge: "8",  mark: "8",      date: "22.01.2026", credits: 5, spec: "Automotive Engineering — English track", name: "Special Mathematics & Probability" },
-      { id: 12, badge: "AD", mark: "Absent", date: "—",          credits: 1, spec: "Automotive Engineering — English track", name: "Physical Education III" },
-      { id: 13, badge: "6",  mark: "6",      date: "20.01.2026", credits: 4, spec: "Automotive Engineering — English track", name: "Applied Electronics" },
-      { id: 14, badge: "7",  mark: "7",      date: "19.01.2026", credits: 4, spec: "Automotive Engineering — English track", name: "General Economics" },
-      { id: 15, badge: "7",  mark: "7",      date: "19.01.2026", credits: 5, spec: "Automotive Engineering — English track", name: "Mechanics II" },
-      { id: 16, badge: "9",  mark: "9",      date: "19.01.2026", credits: 3, spec: "Automotive Engineering — English track", name: "French 3" },
-      { id: 17, badge: "9",  mark: "9",      date: "15.01.2026", credits: 4, spec: "Automotive Engineering — English track", name: "Technical Drawing II" },
-    ],
-  },
-  "2024-2025": {
-    "Semester 2": [
-      { id: 18, badge: "8", mark: "8", date: "18.06.2025", credits: 5, spec: "Automotive Engineering — English track", name: "Thermodynamics" },
-      { id: 19, badge: "6", mark: "6", date: "12.06.2025", credits: 4, spec: "Automotive Engineering — English track", name: "Materials Science" },
-    ],
-    "Semester 1": [
-      { id: 20, badge: "7", mark: "7", date: "16.01.2025", credits: 5, spec: "Automotive Engineering — English track", name: "Calculus II" },
-      { id: 21, badge: "9", mark: "9", date: "14.01.2025", credits: 4, spec: "Automotive Engineering — English track", name: "Technical Drawing I" },
-    ],
-  },
-};
+    /* DASHBOARD */
+    #dashboard-view { display: block; }
+    .dash-header { text-align: center; margin-top: 15px; margin-bottom: 25px; font-size: 18px; font-weight: 500; }
+    .hero-card {
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+        border-radius: 12px; padding: 25px 20px; margin-bottom: 20px;
+        position: relative; overflow: hidden; min-height: 120px;
+        display: flex; flex-direction: column; justify-content: center;
+    }
+    .hero-card::after {
+        content: ''; position: absolute; right: -30px; top: -30px;
+        width: 200px; height: 200px; background-color: #333; border-radius: 50%; opacity: 0.2;
+    }
+    .univ-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 8px; color: #ccc; z-index: 2; }
+    .hero-title { font-size: 22px; font-weight: 700; line-height: 1.2; z-index: 2; }
+    
+    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .grid-item {
+        background-color: #242424; border-radius: 12px; padding: 25px 10px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; cursor: pointer;
+    }
+    .grid-item:active { background-color: #333; }
+    .item-label { font-size: 13px; font-weight: 600; letter-spacing: 0.5px; }
 
-const SCORES = {
-  "2024-2025": {
-    finalScore: "7.05",
-    situation: "Promoted (full credits)",
-    spec: "Automotive Engineering — English track",
-    sem1: { avg: "8.03", credits: 30 },
-    sem2: { avg: "6.40", credits: 30 },
-  },
-  "2025-2026": {
-    finalScore: null,
-    situation: null,
-    spec: "Automotive Engineering — English track",
-    sem1: { avg: "No average", credits: 24 },
-    sem2: { avg: "No average", credits: 18 },
-  },
-};
+    /* BOTTOM NAV */
+    .bottom-nav {
+        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+        width: 100%; max-width: 400px; height: 65px; background-color: #161616;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 40px env(safe-area-inset-bottom) 40px; box-sizing: border-box;
+        border-top: 1px solid #222; z-index: 10;
+    }
+    .nav-icon { width: 24px; height: 24px; fill: #ff9800; cursor: pointer; }
+    .center-fab {
+        position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+        background-color: #ff9800; width: 55px; height: 55px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .center-fab svg { width: 24px; height: 24px; fill: #000; }
 
-const SCHOLARSHIPS = [
-  { id: 1, name: "Social Scholarship", period: "Annual", spec: "Automotive Engineering — English track" },
-  { id: 2, name: "Occasional Social Scholarship, Semester 1", period: "One-time, semester 1", spec: "Automotive Engineering — English track" },
-];
+    /* GLIDING TABS */
+    .tabs { 
+        display: flex; justify-content: space-between; position: relative;
+        border-bottom: 1px solid #333; margin-bottom: 20px; color: #aaa; font-size: 15px; 
+    }
+    .tab { padding-bottom: 12px; flex-grow: 1; text-align: center; cursor: pointer; transition: color 0.3s; }
+    .tab.active { color: #ff9800; }
+    
+    /* The magic sliding bar */
+    .tab-slider {
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        height: 2px;
+        background-color: #ff9800;
+        transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        z-index: 2;
+    }
+    
+    /* EMPTY STATES */
+    .empty-state {
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; margin-top: 100px;
+    }
+    .empty-icon { width: 120px; height: 90px; fill: #d4d4d4; margin-bottom: 25px; }
+    .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
 
-const DASHBOARD_ITEMS = [
-  { key: "schedule", label: "Schedule", icon: Clock },
-  { key: "fees", label: "Fees", icon: DollarSign },
-  { key: "results", label: "Results", icon: ListChecks },
-  { key: "exams", label: "Exams", icon: FileText },
-  { key: "canteen", label: "Canteen", icon: UtensilsCrossed },
-  { key: "announcements", label: "Announcements", icon: MessageSquareWarning },
-];
+    /* PAGE WRAPPERS */
+    #schedule-wrapper, #fees-wrapper, #results-wrapper { display: none; padding-bottom: 20px;}
 
-const FEES = [
-  { id: 1, name: "Tuition — Semester 2", amount: "1,250 RON", due: "15 Oct 2026", status: "Due" },
-  { id: 2, name: "Dorm fee — September", amount: "310 RON", due: "05 Sep 2026", status: "Paid" },
-  { id: 3, name: "Dorm fee — October", amount: "310 RON", due: "05 Oct 2026", status: "Due" },
-];
+    /* SCHEDULE */
+    .date-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
+    .date-nav-arrow { font-size: 18px; color: #fff; cursor: pointer; padding: 0 10px; }
+    .day-list { display: flex; justify-content: space-between; margin-bottom: 40px; }
+    .day-card {
+        background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px; width: 17%; 
+        display: flex; flex-direction: column; align-items: center; padding: 12px 0 10px 0; color: #fff; cursor: pointer; transition: all 0.3s;
+    }
+    .day-card.active { background-color: #ff9800; border-color: #ff9800; color: #fff; transform: scale(1.05); }
+    .day-num { font-size: 18px; font-weight: 500; border-bottom: 1px solid #444; width: 60%; text-align: center; padding-bottom: 6px; margin-bottom: 6px; }
+    .day-card.active .day-num { border-color: rgba(255,255,255,0.4); }
+    .day-name { font-size: 11px; color: #aaa; }
+    .day-card.active .day-name { color: #fff; }
 
-const EXAMS = [
-  { id: 1, course: "Machine Elements I", date: "12 Jan 2027", time: "09:00", room: "EB-114" },
-  { id: 2, course: "Applied Electronics", date: "14 Jan 2027", time: "11:00", room: "EA-208" },
-  { id: 3, course: "French 4", date: "20 Jan 2027", time: "10:00", room: "L-002" },
-];
+    /* RESULTS */
+    .year-selector { display: flex; gap: 12px; margin-bottom: 20px; }
+    .year-btn { background-color: #111; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+    .year-btn.active { background-color: #ffb74d; color: #000; }
+    .semester-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; margin-top: 25px; }
+    .course-card, .score-card { background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    .course-card { display: flex; align-items: center; }
+    .grade-badge {
+        background-color: #1a1a1a; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; 
+        border-radius: 10px; font-weight: 600; margin-right: 15px; font-size: 16px; border: 1px solid #333;
+        -webkit-user-select: text; user-select: text; caret-color: #ff9800; flex-shrink: 0;
+    }
+    .grade-badge:focus, .editable-text:focus { outline: none; border-color: #ff9800; background-color: #333; }
+    .course-name { flex-grow: 1; font-size: 16px; line-height: 1.4; padding-right: 10px; }
+    .score-title { text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+    .score-row { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 15px; color: #eee; }
+    .score-icon { margin-right: 10px; font-size: 18px; color: #ddd; width: 20px; text-align: center; }
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; margin-top: 20px; }
+    .score-grid-title { font-size: 15px; margin-bottom: 8px; color: #eee; }
+    .score-pill {
+        background-color: #161616; border-radius: 10px; padding: 10px; font-weight: 500; margin-bottom: 8px; 
+        border: 1px solid #2a2a2a; -webkit-user-select: text; user-select: text; caret-color: #ff9800;
+    }
+    .score-credits { font-size: 13px; color: #aaa; }
+    .editable-text { -webkit-user-select: text; user-select: text; caret-color: #ff9800; padding: 0 2px; border-radius: 4px; }
+</style>
+</head>
+<body>
 
-const CANTEEN = {
-  day: "Wednesday, 09 September 2026",
-  items: [
-    { course: "Soup", name: "Chicken & vegetable soup" },
-    { course: "Main", name: "Grilled chicken with rice & vegetables" },
-    { course: "Vegetarian", name: "Stuffed peppers with polenta" },
-    { course: "Dessert", name: "Apple cake" },
-  ],
-};
+<div class="app-container">
 
-const ANNOUNCEMENTS = [
-  { id: 1, title: "Library extended hours", body: "The central library will stay open until midnight during exam weeks.", date: "2 days ago" },
-  { id: 2, title: "Career fair — 24 September", body: "Meet recruiters from 40+ companies in the main hall, 10:00–17:00.", date: "5 days ago" },
-  { id: 3, title: "Schedule update", body: "Mechanics II moves to room M-101 starting next week.", date: "1 week ago" },
-];
+    <!-- ================= DASHBOARD VIEW ================= -->
+    <div id="dashboard-view" class="page-view">
+        <div class="dash-header">Dashboard</div>
 
-// ---------------------------------------------------------------------------
-// iOS Safari note: `:active` styles are silently ignored on elements with no
-// touch listener attached (a long-standing Safari quirk). Adding a no-op
-// onTouchStart is the standard fix — every tappable element below has one via
-// this helper, so press states actually show up on an iPhone, not just desktop.
-// ---------------------------------------------------------------------------
-const tap = { onTouchStart: () => {} };
-
-// ---------------------------------------------------------------------------
-// Small building blocks
-// ---------------------------------------------------------------------------
-
-function TopBar({ title, onBack, right }) {
-  return (
-    <div className="flex items-center justify-between px-5 pt-5 pb-4">
-      <div className="w-9">
-        {onBack && (
-          <button
-            {...tap}
-            onClick={onBack}
-            className="text-neutral-300 active:text-orange-400 active:scale-90 transition-transform duration-150"
-          >
-            <ChevronLeft size={26} />
-          </button>
-        )}
-      </div>
-      <h1 className="text-neutral-100 text-xl font-medium tracking-tight">{title}</h1>
-      <div className="w-9 flex justify-end text-neutral-400">{right}</div>
-    </div>
-  );
-}
-
-function Card({ children, className = "" }) {
-  return <div className={"bg-neutral-900 rounded-2xl " + className}>{children}</div>;
-}
-
-function IconBadge({ icon: Icon, size = 18 }) {
-  return (
-    <div className="w-9 h-9 rounded-xl bg-neutral-800 flex items-center justify-center text-neutral-100">
-      <Icon size={size} />
-    </div>
-  );
-}
-
-function EmptySection({ label }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-24 text-center px-8 animate-[fadein_.4s_ease-out]">
-      <Mountain size={64} className="text-neutral-700 mb-5" strokeWidth={1.5} />
-      <p className="text-neutral-500 text-sm">{label}</p>
-    </div>
-  );
-}
-
-// Smooth expand/collapse with no JS height measuring: animating
-// grid-template-rows between 0fr and 1fr is the CSS-only trick for this.
-function Collapse({ open, children }) {
-  return (
-    <div
-      className="grid"
-      style={{
-        gridTemplateRows: open ? "1fr" : "0fr",
-        transition: `grid-template-rows 320ms ${IOS_EASE}`,
-      }}
-    >
-      <div className="overflow-hidden">{children}</div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Screens
-// ---------------------------------------------------------------------------
-
-function DashboardScreen({ go }) {
-  return (
-    <div className="pb-28">
-      <TopBar
-        title="Dashboard"
-        right={
-          <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
-            <User size={16} className="text-neutral-400" />
-          </div>
-        }
-      />
-
-      <div className="px-5">
-        <div className="relative rounded-3xl overflow-hidden h-44 mb-5">
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(120deg, #1b1b1d 0%, #2a2a2d 45%, #3a3a3d 100%)" }}
-          />
-          <div className="absolute -right-6 -bottom-10 opacity-25">
-            <Landmark size={160} strokeWidth={1} className="text-neutral-400" />
-          </div>
-          <div className="relative z-10 h-full flex flex-col justify-center px-5">
-            <div className="flex items-center gap-2 mb-3 text-neutral-200">
-              <Landmark size={16} />
-              <span className="text-[11px] leading-tight text-neutral-300">
-                Transilvania<br />University<br />of Brașov
-              </span>
-            </div>
-            <h2 className="text-white text-2xl font-semibold leading-tight">
-              Transilvania<br />University<br />of Brașov
-            </h2>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          {DASHBOARD_ITEMS.map((item, i) => (
-            <button
-              key={item.key}
-              {...tap}
-              onClick={() => go(item.key)}
-              style={{ animation: `rise .4s ${IOS_EASE} both`, animationDelay: `${i * 35}ms` }}
-              className="bg-neutral-900 rounded-2xl py-7 flex flex-col items-center gap-3 active:bg-neutral-800 active:scale-95 transition-transform duration-150"
-            >
-              <IconBadge icon={item.icon} />
-              <span className="text-neutral-100 text-sm tracking-wide">{item.label.toUpperCase()}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ScheduleScreen({ onBack }) {
-  const baseline = useMemo(() => new Date(2026, 8, 9), []); // Wed 09 Sep 2026
-  const [selected, setSelected] = useState(0);
-  const [slideDir, setSlideDir] = useState(1); // 1 = content enters from right, -1 = from left
-
-  const dayLabel = (offset) => {
-    const d = new Date(baseline);
-    d.setDate(d.getDate() + offset);
-    return d;
-  };
-  const weekdayShort = (d) => d.toLocaleDateString("en-US", { weekday: "short" });
-  const fullDate = (d) => d.toLocaleDateString("en-US", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
-
-  const CLASSES_ON = -2;
-  const classes = [
-    { time: "08:00 – 09:40", name: "Mechanics II", type: "Lecture", room: "M-101" },
-    { time: "10:00 – 11:40", name: "Applied Electronics", type: "Lab", room: "EA-208" },
-    { time: "12:00 – 13:40", name: "French 3", type: "Seminar", room: "L-002" },
-  ];
-
-  const step = (dir) => {
-    setSlideDir(dir);
-    setSelected((s) => s + dir);
-  };
-
-  const windowOffsets = [selected - 2, selected - 1, selected, selected + 1, selected + 2];
-  const isFreeDay = selected !== CLASSES_ON;
-
-  return (
-    <div className="pb-28">
-      <TopBar title="Schedule" onBack={onBack} />
-      <div className="px-5 flex items-center justify-between mb-4">
-        <button {...tap} onClick={() => step(-1)} className="text-neutral-400 active:text-orange-400 active:scale-90 transition-transform duration-150">
-          <ChevronLeft size={22} />
-        </button>
-        <span className="text-neutral-100 text-base">{fullDate(dayLabel(selected))}</span>
-        <button {...tap} onClick={() => step(1)} className="text-neutral-400 active:text-orange-400 active:scale-90 transition-transform duration-150">
-          <ChevronRight size={22} />
-        </button>
-      </div>
-
-      <div className="px-5 grid grid-cols-5 gap-2 mb-2">
-        {windowOffsets.map((off) => {
-          const d = dayLabel(off);
-          const isSel = off === selected;
-          return (
-            <button
-              key={off}
-              {...tap}
-              onClick={() => { setSlideDir(off > selected ? 1 : -1); setSelected(off); }}
-              className={
-                "rounded-xl py-3 flex flex-col items-center gap-1 transition-colors duration-300 " +
-                (isSel ? "bg-orange-500" : "bg-neutral-900")
-              }
-            >
-              <span className={"text-lg font-medium transition-colors duration-300 " + (isSel ? "text-white" : "text-neutral-100")}>
-                {String(d.getDate()).padStart(2, "0")}
-              </span>
-              <span className={"text-xs transition-colors duration-300 " + (isSel ? "text-orange-100" : "text-neutral-500")}>
-                {weekdayShort(d)}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div key={selected} style={{ animation: `slidein-${slideDir > 0 ? "r" : "l"} 260ms ${IOS_EASE} both` }}>
-        {!isFreeDay ? (
-          <div className="px-5 pt-4 space-y-3">
-            {classes.map((c, i) => (
-              <Card key={i} className="p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-neutral-100 font-medium">{c.name}</p>
-                    <p className="text-neutral-500 text-sm mt-1">{c.type} · {c.room}</p>
-                  </div>
-                  <span className="text-orange-400 text-sm whitespace-nowrap">{c.time}</span>
+        <div class="hero-card">
+            <div class="univ-logo">
+                <div style="display: flex; gap: 2px;">
+                    <div style="width: 4px; height: 16px; background: #fff;"></div>
+                    <div style="width: 4px; height: 16px; background: #fff;"></div>
+                    <div style="width: 4px; height: 16px; background: #fff;"></div>
                 </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <EmptySection label="It's a free day, just for fun :-)" />
-        )}
-      </div>
+                <span>Transilvania<br>University<br>of Brașov</span>
+            </div>
+            <div class="hero-title">TRANSILVANIA<br>University<br>of Brașov</div>
+        </div>
+
+        <div class="grid-container">
+            <div onclick="openPage('schedule-wrapper', 'forward')" class="grid-item">
+                <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg></div>
+                <div class="item-label">SCHEDULE</div>
+            </div>
+            <div onclick="openPage('fees-wrapper', 'forward')" class="grid-item">
+                <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+                <div class="item-label">FEES</div>
+            </div>
+            <div onclick="openPage('results-wrapper', 'forward')" class="grid-item">
+                <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zM2 16h8v-2H2v2zm19.5-4.5L23 13l-6.99 7-4.51-4.5L13 14l3.01 3 5.49-5.5z"/></svg></div>
+                <div class="item-label">RESULTS</div>
+            </div>
+            <div class="grid-item">
+                <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
+                <div class="item-label">EXAMS</div>
+            </div>
+            <div class="grid-item">
+                <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-9 11h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg></div>
+                <div class="item-label">ANNOUNCEMENTS</div>
+            </div>
+        </div>
     </div>
-  );
-}
 
-function GradeRow({ course, isOpen, onToggle }) {
-  return (
-    <Card className="overflow-hidden">
-      <button {...tap} onClick={onToggle} className="w-full flex items-center gap-3 p-4 text-left active:bg-neutral-800 transition-colors duration-150">
-        <div className="w-11 h-11 rounded-xl bg-neutral-800 flex items-center justify-center text-neutral-100 font-medium shrink-0">
-          {course.badge}
+
+    <!-- ================= FEES VIEW ================= -->
+    <div id="fees-wrapper" class="page-view">
+        <div class="page-header">
+            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
+            <span>My fees</span>
+            <span style="visibility: hidden; padding: 0 10px;">›</span>
         </div>
-        <span className="flex-1 text-neutral-100 text-[15px] leading-snug">{course.name}</span>
-        <ChevronDown
-          size={18}
-          className={"shrink-0 transition-transform duration-300 " + (isOpen ? "text-orange-400 rotate-180" : "text-neutral-500 rotate-0")}
-          style={{ transitionTimingFunction: IOS_EASE }}
-        />
-      </button>
-      <Collapse open={isOpen}>
-        <div className="px-4 pb-4 space-y-2.5 text-sm text-neutral-400">
-          <div className="flex items-center gap-2.5">
-            <GraduationCap size={16} className="text-neutral-500 shrink-0" />
-            <span>Mark: {course.mark}</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <Calendar size={16} className="text-neutral-500 shrink-0" />
-            <span>Date: {course.date}</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <BookOpen size={16} className="text-neutral-500 shrink-0" />
-            <span>Credits number: {course.credits}</span>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <AlignLeft size={16} className="text-neutral-500 shrink-0 mt-0.5" />
-            <span>Specialisation: {course.spec}</span>
-          </div>
+
+        <div class="tabs" id="fees-tabs">
+            <div class="tab active">Accommodation</div>
+            <div class="tab">Tuition and other</div>
+            <!-- The gliding indicator (50% width since there are 2 tabs) -->
+            <div class="tab-slider" id="fees-slider" style="width: 50%; transform: translateX(0%);"></div>
         </div>
-      </Collapse>
-    </Card>
-  );
-}
 
-function GradesTab() {
-  const years = Object.keys(GRADES);
-  const [year, setYear] = useState(years[0]);
-  const [openId, setOpenId] = useState(null);
-  const data = GRADES[year];
+        <div id="view-accommodation" class="empty-state">
+            <svg style="width: 100px; height: 100px; fill: #d4d4d4; margin-bottom: 20px;" viewBox="0 0 24 24">
+                <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/>
+            </svg>
+            <div class="empty-text">No accommodation fees</div>
+        </div>
 
-  return (
-    <div className="px-5 pt-4 pb-4">
-      <div className="flex gap-2 mb-5">
-        {years.map((y) => (
-          <button
-            key={y}
-            {...tap}
-            onClick={() => { setYear(y); setOpenId(null); }}
-            className={
-              "px-4 py-2 rounded-full text-sm transition-colors duration-250 active:scale-95 " +
-              (y === year ? "bg-orange-500 text-white" : "bg-neutral-900 text-neutral-400")
+        <div id="view-tuition" class="empty-state" style="display: none;">
+            <svg style="width: 100px; height: 100px; fill: #d4d4d4; margin-bottom: 20px;" viewBox="0 0 24 24">
+                <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"/>
+            </svg>
+            <div class="empty-text">No other fees</div>
+        </div>
+    </div>
+
+
+    <!-- ================= SCHEDULE VIEW ================= -->
+    <div id="schedule-wrapper" class="page-view">
+        <div class="page-header">
+            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
+            <span>Schedule</span>
+            <span class="header-dots">···</span>
+        </div>
+
+        <div class="date-nav">
+            <span class="date-nav-arrow">‹</span>
+            <span>Thursday, 10 September 2026</span>
+            <span class="date-nav-arrow">›</span>
+        </div>
+
+        <div class="day-list" id="schedule-days">
+            <div class="day-card"><div class="day-num">07</div><div class="day-name">Mon</div></div>
+            <div class="day-card"><div class="day-num">08</div><div class="day-name">Tue</div></div>
+            <div class="day-card"><div class="day-num">09</div><div class="day-name">Wed</div></div>
+            <div class="day-card active"><div class="day-num">10</div><div class="day-name">Thu</div></div>
+            <div class="day-card"><div class="day-num">11</div><div class="day-name">Fri</div></div>
+        </div>
+
+        <div class="empty-state">
+            <svg class="empty-icon" viewBox="0 0 100 60">
+                <polygon points="10,60 40,25 65,55" fill="#d4d4d4"/>
+                <polygon points="40,60 65,30 90,60" fill="#d4d4d4"/>
+            </svg>
+            <div class="empty-text">It's a free day, just for fun :-)</div>
+        </div>
+    </div>
+
+
+    <!-- ================= RESULTS VIEW ================= -->
+    <div id="results-wrapper" class="page-view">
+        <div class="page-header">
+            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
+            <span>Results</span>
+            <span style="visibility: hidden;">›</span>
+        </div>
+
+        <div class="tabs" id="results-tabs">
+            <div class="tab active">Grades</div>
+            <div class="tab">Scores</div>
+            <div class="tab">Scholarships</div>
+            <!-- The gliding indicator (33.33% width since there are 3 tabs) -->
+            <div class="tab-slider" id="results-slider" style="width: 33.33%; transform: translateX(0%);"></div>
+        </div>
+
+        <div id="view-grades">
+            <div class="year-selector">
+                <button class="year-btn active">2025-2026</button>
+                <button class="year-btn">2024-2025</button>
+                <div class="dropdown-icon" style="margin-left: auto; align-self: center;">▼</div>
+            </div>
+
+            <div class="semester-title">Semester 1</div>
+            <div class="course-list">
+                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Rezistența materialelor I</div><div class="dropdown-icon">▼</div></div>
+                <div class="course-card"><div class="grade-badge" contenteditable="true">8</div><div class="course-name">Matematici speciale și teoria probabilităților...</div><div class="dropdown-icon">▼</div></div>
+                <div class="course-card"><div class="grade-badge" contenteditable="true">AD</div><div class="course-name">Educație fizică și sport III</div><div class="dropdown-icon">▼</div></div>
+                <div class="course-card"><div class="grade-badge" contenteditable="true">6</div><div class="course-name">Electronică aplicată</div><div class="dropdown-icon">▼</div></div>
+                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Economie generală</div><div class="dropdown-icon">▼</div></div>
+                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Mecanică II</div><div class="dropdown-icon">▼</div></div>
+                <div class="course-card"><div class="grade-badge" contenteditable="true">9</div><div class="course-name">Limba franceză 3</div><div class="dropdown-icon">▼</div></div>
+            </div>
+            
+            <div class="semester-title">Semester 2</div>
+            <div class="course-list">
+                <div class="course-card"><div class="grade-badge" contenteditable="true">8</div><div class="course-name">Mecanisme</div><div class="dropdown-icon">▼</div></div>
+                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Mecanica fluidelor și mașini hidraulice</div><div class="dropdown-icon">▼</div></div>
+            </div>
+        </div>
+
+        <div id="view-scores" style="display: none;">
+            <div class="score-card">
+                <div class="score-title">An universitar 2024-2025 (I)</div>
+                <div class="score-row"><span class="score-icon">★</span><span>Final score: <span class="editable-text" contenteditable="true">7.05</span></span></div>
+                <div class="score-row"><span class="score-icon">🎓</span><span>School situation: <span class="editable-text" contenteditable="true">Promovat</span></span></div>
+                <div class="score-grid">
+                    <div><div class="score-grid-title">Semester I</div><div class="score-pill" contenteditable="true">8.03</div></div>
+                    <div><div class="score-grid-title">Semester II</div><div class="score-pill" contenteditable="true">6.06</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder for Scholarships -->
+        <div id="view-scholarships" class="empty-state" style="display: none;">
+            <div class="empty-text">No active scholarships</div>
+        </div>
+    </div>
+
+    <!-- Persistent Bottom Navigation -->
+    <div class="bottom-nav">
+        <svg onclick="openPage('dashboard-view', 'back')" class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <div class="center-fab"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
+        <div style="width: 24px;"></div>
+    </div>
+
+</div>
+
+<script>
+    // PAGE ROUTER
+    function openPage(pageId, direction) {
+        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper'];
+        pages.forEach(id => {
+            const el = document.getElementById(id);
+            el.style.display = 'none';
+            el.classList.remove('slide-in-right', 'slide-in-left');
+        });
+        
+        const target = document.getElementById(pageId);
+        target.style.display = 'block';
+        if (direction === 'forward') target.classList.add('slide-in-right');
+        else if (direction === 'back') target.classList.add('slide-in-left');
+        window.scrollTo(0, 0);
+    }
+
+    // --- SWIPE GESTURE DETECTOR ---
+    // This allows you to swipe left/right to trigger actions without tapping buttons
+    function attachSwipeListener(wrapperId, onSwipeLeft, onSwipeRight) {
+        const wrapper = document.getElementById(wrapperId);
+        let startX = 0, startY = 0, endX = 0, endY = 0;
+
+        wrapper.addEventListener('touchstart', e => {
+            startX = e.changedTouches[0].screenX;
+            startY = e.changedTouches[0].screenY;
+        }, {passive: true});
+
+        wrapper.addEventListener('touchend', e => {
+            endX = e.changedTouches[0].screenX;
+            endY = e.changedTouches[0].screenY;
+            
+            // Check if horizontal swipe is much larger than vertical swipe (avoids accidental triggers when scrolling)
+            const diffX = Math.abs(endX - startX);
+            const diffY = Math.abs(endY - startY);
+            
+            if (diffX > 50 && diffX > diffY) {
+                if (endX < startX) onSwipeLeft();   // Swiped left (go next)
+                if (endX > startX) onSwipeRight(); // Swiped right (go previous)
             }
-            style={{ transitionTimingFunction: IOS_EASE }}
-          >
-            {y}
-          </button>
-        ))}
-      </div>
-
-      {Object.entries(data).map(([sem, list]) => (
-        <div key={sem} className="mb-5">
-          <p className="text-neutral-100 font-medium mb-3">{sem}</p>
-          <div className="space-y-3">
-            {list.map((course) => (
-              <GradeRow
-                key={course.id}
-                course={course}
-                isOpen={openId === course.id}
-                onToggle={() => setOpenId(openId === course.id ? null : course.id)}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ScoresTab() {
-  return (
-    <div className="px-5 pt-4 pb-4 space-y-4">
-      {Object.entries(SCORES).map(([year, s], i) => (
-        <Card key={year} className="p-4" style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 60}ms` }}>
-          <p className="text-neutral-100 font-medium text-center mb-3">Academic year {year}</p>
-          {s.finalScore && (
-            <div className="flex items-center gap-2.5 text-sm text-neutral-300 mb-2">
-              <Star size={16} className="text-orange-400 shrink-0" />
-              <span>Final score: {s.finalScore}</span>
-            </div>
-          )}
-          {s.situation && (
-            <div className="flex items-center gap-2.5 text-sm text-neutral-300 mb-2">
-              <GraduationCap size={16} className="text-neutral-500 shrink-0" />
-              <span>School situation: {s.situation}</span>
-            </div>
-          )}
-          <div className="flex items-start gap-2.5 text-sm text-neutral-300 mb-4">
-            <AlignLeft size={16} className="text-neutral-500 shrink-0 mt-0.5" />
-            <span>Specialisation: {s.spec}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="text-center">
-              <p className="text-neutral-500 text-xs mb-2">Semester I</p>
-              <div className="bg-neutral-800 rounded-xl py-2 text-neutral-100 text-sm mb-1">{s.sem1.avg}</div>
-              <p className="text-neutral-500 text-xs">{s.sem1.credits} credits</p>
-            </div>
-            <div className="text-center">
-              <p className="text-neutral-500 text-xs mb-2">Semester II</p>
-              <div className="bg-neutral-800 rounded-xl py-2 text-neutral-100 text-sm mb-1">{s.sem2.avg}</div>
-              <p className="text-neutral-500 text-xs">{s.sem2.credits} credits</p>
-            </div>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function ScholarshipsTab() {
-  return (
-    <div className="px-5 pt-4 pb-4 space-y-3">
-      {SCHOLARSHIPS.map((s, i) => (
-        <Card key={s.id} className="p-4" style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 60}ms` }}>
-          <p className="text-neutral-100 font-medium text-center mb-3">{s.name}</p>
-          <div className="flex items-center gap-2.5 text-sm text-neutral-300 mb-2">
-            <Calendar size={16} className="text-neutral-500 shrink-0" />
-            <span>Period: {s.period}</span>
-          </div>
-          <div className="flex items-start gap-2.5 text-sm text-neutral-300">
-            <AlignLeft size={16} className="text-neutral-500 shrink-0 mt-0.5" />
-            <span>Specialisation: {s.spec}</span>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function ResultsScreen({ onBack }) {
-  const tabs = ["Grades", "Scores", "Scholarships"];
-  const [tab, setTab] = useState("Grades");
-  const idx = tabs.indexOf(tab);
-
-  return (
-    <div className="pb-28">
-      <TopBar title="Results" onBack={onBack} />
-      <div className="px-5 relative">
-        <div className="flex border-b border-neutral-800">
-          {tabs.map((t) => (
-            <button
-              key={t}
-              {...tap}
-              onClick={() => setTab(t)}
-              className={"flex-1 pb-3 text-sm transition-colors duration-200 " + (tab === t ? "text-orange-400" : "text-neutral-500")}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-        <div
-          className="absolute bottom-0 h-0.5 bg-orange-400"
-          style={{
-            width: `${100 / tabs.length}%`,
-            transform: `translateX(${idx * 100}%)`,
-            transition: `transform 280ms ${IOS_EASE}`,
-          }}
-        />
-      </div>
-      <div key={tab} style={{ animation: `fadeup .28s ${IOS_EASE} both` }}>
-        {tab === "Grades" && <GradesTab />}
-        {tab === "Scores" && <ScoresTab />}
-        {tab === "Scholarships" && <ScholarshipsTab />}
-      </div>
-    </div>
-  );
-}
-
-function FeesScreen({ onBack }) {
-  return (
-    <div className="pb-28">
-      <TopBar title="Fees" onBack={onBack} />
-      <div className="px-5 space-y-3 pt-2">
-        {FEES.map((f, i) => (
-          <Card key={f.id} className="p-4 flex items-center justify-between" style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 50}ms` }}>
-            <div>
-              <p className="text-neutral-100 font-medium">{f.name}</p>
-              <p className="text-neutral-500 text-sm mt-1">Due {f.due}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-neutral-100">{f.amount}</p>
-              <p className={"text-xs mt-1 " + (f.status === "Paid" ? "text-emerald-400" : "text-orange-400")}>{f.status}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ExamsScreen({ onBack }) {
-  return (
-    <div className="pb-28">
-      <TopBar title="Exams" onBack={onBack} />
-      <div className="px-5 space-y-3 pt-2">
-        {EXAMS.map((e, i) => (
-          <Card key={e.id} className="p-4" style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 50}ms` }}>
-            <p className="text-neutral-100 font-medium mb-2">{e.course}</p>
-            <div className="flex items-center gap-2.5 text-sm text-neutral-400 mb-1.5">
-              <Calendar size={15} className="text-neutral-500" />
-              <span>{e.date} · {e.time}</span>
-            </div>
-            <div className="flex items-center gap-2.5 text-sm text-neutral-400">
-              <MapPin size={15} className="text-neutral-500" />
-              <span>Room {e.room}</span>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function CanteenScreen({ onBack }) {
-  return (
-    <div className="pb-28">
-      <TopBar title="Canteen" onBack={onBack} />
-      <div className="px-5 pt-2">
-        <p className="text-neutral-500 text-sm mb-4">{CANTEEN.day}</p>
-        <div className="space-y-3">
-          {CANTEEN.items.map((it, i) => (
-            <Card key={i} className="p-4 flex items-center gap-3" style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 50}ms` }}>
-              <IconBadge icon={UtensilsCrossed} />
-              <div>
-                <p className="text-neutral-500 text-xs mb-0.5">{it.course}</p>
-                <p className="text-neutral-100 text-sm">{it.name}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AnnouncementsScreen({ onBack }) {
-  return (
-    <div className="pb-28">
-      <TopBar title="Announcements" onBack={onBack} />
-      <div className="px-5 space-y-3 pt-2">
-        {ANNOUNCEMENTS.map((a, i) => (
-          <Card key={a.id} className="p-4" style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 50}ms` }}>
-            <div className="flex items-center justify-between mb-1.5">
-              <p className="text-neutral-100 font-medium">{a.title}</p>
-              <span className="text-neutral-600 text-xs whitespace-nowrap">{a.date}</span>
-            </div>
-            <p className="text-neutral-400 text-sm leading-snug">{a.body}</p>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function RadioScreen() {
-  return (
-    <div className="pb-28">
-      <TopBar title="Campus Radio" />
-      <div className="px-5 pt-8 flex flex-col items-center">
-        <div className="w-40 h-40 rounded-full bg-neutral-900 flex items-center justify-center mb-6">
-          <Radio size={56} className="text-orange-400" />
-        </div>
-        <p className="text-neutral-100 text-lg mb-1">Campus Radio</p>
-        <p className="text-neutral-500 text-sm mb-8">Live from the student center</p>
-        <button {...tap} className="bg-orange-500 text-white rounded-full px-8 py-3 text-sm active:scale-95 transition-transform duration-150">
-          Play live stream
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function NotificationsScreen() {
-  const items = [
-    { id: 1, text: "Your grade for French 4 was posted.", time: "2h ago" },
-    { id: 2, text: "Schedule updated for tomorrow.", time: "1d ago" },
-    { id: 3, text: "Dorm fee due in 5 days.", time: "2d ago" },
-  ];
-  return (
-    <div className="pb-28">
-      <TopBar title="Notifications" />
-      <div className="px-5 space-y-3 pt-2">
-        {items.map((n, i) => (
-          <Card key={n.id} className="p-4 flex items-start gap-3" style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 50}ms` }}>
-            <IconBadge icon={Bell} size={16} />
-            <div className="flex-1">
-              <p className="text-neutral-200 text-sm">{n.text}</p>
-              <p className="text-neutral-600 text-xs mt-1">{n.time}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MenuScreen({ go }) {
-  return (
-    <div className="pb-28">
-      <TopBar title="Menu" />
-      <div className="px-5 space-y-2 pt-2">
-        {DASHBOARD_ITEMS.map((item, i) => (
-          <button
-            key={item.key}
-            {...tap}
-            onClick={() => go(item.key)}
-            style={{ animation: `rise .35s ${IOS_EASE} both`, animationDelay: `${i * 40}ms` }}
-            className="w-full bg-neutral-900 rounded-xl p-4 flex items-center gap-3 active:bg-neutral-800 active:scale-[0.98] transition-transform duration-150"
-          >
-            <IconBadge icon={item.icon} />
-            <span className="text-neutral-100 text-sm">{item.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// Bottom sheet with a real enter/exit animation: stays mounted a beat after
-// close so the slide-down + backdrop fade can finish before it's removed.
-function IdCardSheet({ show, onClose }) {
-  const [mounted, setMounted] = useState(show);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (show) {
-      setMounted(true);
-      const raf = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(raf);
-    } else {
-      setVisible(false);
-      const t = setTimeout(() => setMounted(false), SHEET_MS);
-      return () => clearTimeout(t);
+        }, {passive: true});
     }
-  }, [show]);
 
-  if (!mounted) return null;
-
-  return (
-    <div className="absolute inset-0 z-30 flex items-end">
-      <div
-        className="absolute inset-0 bg-black"
-        style={{ opacity: visible ? 0.6 : 0, transition: `opacity ${SHEET_MS}ms ${IOS_EASE}` }}
-        onClick={onClose}
-      />
-      <div
-        className="relative w-full bg-neutral-950 rounded-t-3xl p-5 pb-8"
-        style={{
-          transform: visible ? "translateY(0%)" : "translateY(100%)",
-          transition: `transform ${SHEET_MS}ms ${IOS_EASE}`,
-        }}
-      >
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-neutral-100 text-lg font-medium">Digital student card</p>
-          <button {...tap} onClick={onClose} className="text-neutral-500 active:scale-90 transition-transform duration-150">
-            <X size={22} />
-          </button>
-        </div>
-        <div className="rounded-2xl p-5" style={{ background: "linear-gradient(135deg,#2a2a2d,#111112)" }}>
-          <div className="flex items-center gap-2 text-neutral-300 mb-4">
-            <Landmark size={16} />
-            <span className="text-xs">Transilvania University of Brașov</span>
-          </div>
-          <div className="flex gap-4">
-            <div className="w-20 h-20 rounded-xl bg-neutral-800 flex items-center justify-center shrink-0">
-              <User size={32} className="text-neutral-500" />
-            </div>
-            <div className="flex-1">
-              <p className="text-white font-medium">Alex Popescu</p>
-              <p className="text-neutral-400 text-xs mt-1">Faculty of Mechanical Engineering</p>
-              <p className="text-neutral-400 text-xs">Automotive Engineering · Year 3</p>
-              <p className="text-neutral-500 text-xs mt-1">Group 3141 · No. 24</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-5 pt-4 border-t border-neutral-800">
-            <div>
-              <p className="text-neutral-500 text-xs">Valid through</p>
-              <p className="text-neutral-200 text-sm">2026–2027</p>
-            </div>
-            <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
-              <div
-                className="w-12 h-12 bg-neutral-900"
-                style={{ backgroundImage: "repeating-linear-gradient(45deg, black 0 3px, white 3px 6px)" }}
-              />
-            </div>
-          </div>
-          <p className="text-center text-neutral-500 text-xs mt-3">Code refreshes in 4:32</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Bottom navigation
-// ---------------------------------------------------------------------------
-
-function BottomNav({ rootTab, go, onCard }) {
-  const items = [
-    { key: "dashboard", icon: Home },
-    { key: "radio", icon: Radio },
-    { key: "notifications", icon: Bell },
-    { key: "menu", icon: LayoutGrid },
-  ];
-  return (
-    <div className="absolute bottom-0 left-0 right-0 z-20">
-      <div className="relative bg-neutral-950 border-t border-neutral-900 px-8 pt-4 pb-6 flex items-center justify-between">
-        {items.slice(0, 2).map((it) => (
-          <button
-            key={it.key}
-            {...tap}
-            onClick={() => go(it.key)}
-            className={"transition-colors duration-200 active:scale-90 duration-150 " + (rootTab === it.key ? "text-orange-400" : "text-neutral-500")}
-          >
-            <it.icon size={24} />
-          </button>
-        ))}
-        <div className="w-12" />
-        {items.slice(2).map((it) => (
-          <button
-            key={it.key}
-            {...tap}
-            onClick={() => go(it.key)}
-            className={"transition-colors duration-200 active:scale-90 duration-150 " + (rootTab === it.key ? "text-orange-400" : "text-neutral-500")}
-          >
-            <it.icon size={24} />
-          </button>
-        ))}
-        <button
-          {...tap}
-          onClick={onCard}
-          className="absolute left-1/2 -translate-x-1/2 -top-6 w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30 active:scale-90 transition-transform duration-150"
-        >
-          <CreditCard size={22} className="text-white" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Animated navigation stack — mimics an iOS UINavigationController: the
-// pushed screen keeps mounted while it and the root screen slide, and only
-// unmounts once the pop transition has actually finished.
-// ---------------------------------------------------------------------------
-
-function NavStack({ root, subKey, renderSub }) {
-  const [renderedKey, setRenderedKey] = useState(subKey);
-  const [phase, setPhase] = useState(subKey ? "shown" : "idle"); // idle | entering | shown | leaving
-  const prevKey = useRef(subKey);
-
-  useEffect(() => {
-    if (subKey && !prevKey.current) {
-      // push
-      setRenderedKey(subKey);
-      setPhase("entering");
-      const raf = requestAnimationFrame(() => setPhase("shown"));
-      prevKey.current = subKey;
-      return () => cancelAnimationFrame(raf);
+    // --- FEES TAB LOGIC (With Glide) ---
+    let feesIndex = 0;
+    const feesTabs = document.querySelectorAll('#fees-tabs .tab');
+    function setFeesTab(index) {
+        if (index < 0 || index > 1) return;
+        feesIndex = index;
+        
+        // Update active class
+        feesTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+        // Move sliding bar (0% or 100%)
+        document.getElementById('fees-slider').style.transform = `translateX(${index * 100}%)`;
+        
+        // Switch Views
+        document.getElementById('view-accommodation').style.display = index === 0 ? 'flex' : 'none';
+        document.getElementById('view-tuition').style.display = index === 1 ? 'flex' : 'none';
     }
-    if (!subKey && prevKey.current) {
-      // pop
-      setPhase("leaving");
-      const t = setTimeout(() => {
-        setRenderedKey(null);
-        setPhase("idle");
-      }, PUSH_MS);
-      prevKey.current = subKey;
-      return () => clearTimeout(t);
+    // Allow tapping on the tabs
+    feesTabs.forEach((tab, i) => tab.addEventListener('click', () => setFeesTab(i)));
+    // Allow swiping on the page
+    attachSwipeListener('fees-wrapper', () => setFeesTab(feesIndex + 1), () => setFeesTab(feesIndex - 1));
+
+
+    // --- RESULTS TAB LOGIC (With Glide) ---
+    let resultsIndex = 0;
+    const resultsTabs = document.querySelectorAll('#results-tabs .tab');
+    function setResultsTab(index) {
+        if (index < 0 || index > 2) return;
+        resultsIndex = index;
+        
+        resultsTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+        document.getElementById('results-slider').style.transform = `translateX(${index * 100}%)`;
+        
+        document.getElementById('view-grades').style.display = index === 0 ? 'block' : 'none';
+        document.getElementById('view-scores').style.display = index === 1 ? 'block' : 'none';
+        document.getElementById('view-scholarships').style.display = index === 2 ? 'flex' : 'none';
     }
-    if (subKey && prevKey.current && subKey !== prevKey.current) {
-      // switching directly between two pushed pages (e.g. via Menu)
-      setRenderedKey(subKey);
-      prevKey.current = subKey;
+    resultsTabs.forEach((tab, i) => tab.addEventListener('click', () => setResultsTab(i)));
+    attachSwipeListener('results-wrapper', () => setResultsTab(resultsIndex + 1), () => setResultsTab(resultsIndex - 1));
+
+
+    // --- SCHEDULE LOGIC (Swipe to change days) ---
+    let scheduleIndex = 3; // Starts on Thursday (index 3)
+    const scheduleDays = document.querySelectorAll('.day-card');
+    function setScheduleDay(index) {
+        if (index < 0 || index > 4) return;
+        scheduleIndex = index;
+        scheduleDays.forEach((card, i) => card.classList.toggle('active', i === index));
     }
-  }, [subKey]);
+    scheduleDays.forEach((card, i) => card.addEventListener('click', () => setScheduleDay(i)));
+    attachSwipeListener('schedule-wrapper', () => setScheduleDay(scheduleIndex + 1), () => setScheduleDay(scheduleIndex - 1));
 
-  const pushed = phase === "entering" || phase === "shown" || phase === "leaving";
-  const subOnRight = phase === "entering" || phase === "leaving";
 
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      <div
-        className="absolute inset-0 overflow-y-auto"
-        style={{
-          transform: pushed ? "translateX(-22%)" : "translateX(0%)",
-          transition: `transform ${PUSH_MS}ms ${IOS_EASE}`,
-        }}
-      >
-        <div
-          style={{
-            opacity: pushed ? 0.5 : 1,
-            transition: `opacity ${PUSH_MS}ms ${IOS_EASE}`,
-            pointerEvents: pushed ? "none" : "auto",
-          }}
-        >
-          {root}
-        </div>
-      </div>
-
-      {renderedKey && (
-        <div
-          className="absolute inset-0 overflow-y-auto bg-neutral-950"
-          style={{
-            transform: subOnRight ? "translateX(100%)" : "translateX(0%)",
-            transition: `transform ${PUSH_MS}ms ${IOS_EASE}`,
-            boxShadow: "-8px 0 24px rgba(0,0,0,0.35)",
-          }}
-        >
-          {renderSub(renderedKey)}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// App shell
-// ---------------------------------------------------------------------------
-
-export default function App() {
-  const [rootTab, setRootTab] = useState("dashboard");
-  const [subPage, setSubPage] = useState(null);
-  const [showCard, setShowCard] = useState(false);
-
-  const openSub = (key) => setSubPage(key);
-  const goBack = () => setSubPage(null);
-  const switchTab = (key) => {
-    setRootTab(key);
-    setSubPage(null);
-  };
-
-  const rootScreen = {
-    dashboard: <DashboardScreen go={openSub} />,
-    radio: <RadioScreen />,
-    notifications: <NotificationsScreen />,
-    menu: <MenuScreen go={openSub} />,
-  }[rootTab];
-
-  const renderSub = (key) => {
-    switch (key) {
-      case "schedule": return <ScheduleScreen onBack={goBack} />;
-      case "results": return <ResultsScreen onBack={goBack} />;
-      case "fees": return <FeesScreen onBack={goBack} />;
-      case "exams": return <ExamsScreen onBack={goBack} />;
-      case "canteen": return <CanteenScreen onBack={goBack} />;
-      case "announcements": return <AnnouncementsScreen onBack={goBack} />;
-      default: return null;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center py-8">
-      <style>{`
-        @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeup { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slidein-r { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes slidein-l { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: translateX(0); } }
-      `}</style>
-      <div
-        className="relative bg-neutral-950 w-full overflow-hidden"
-        style={{ maxWidth: 400, height: 820, borderRadius: 40, boxShadow: "0 30px 60px rgba(0,0,0,0.5)" }}
-      >
-        <NavStack root={rootScreen} subKey={subPage} renderSub={renderSub} />
-        <BottomNav rootTab={rootTab} go={switchTab} onCard={() => setShowCard(true)} />
-        <IdCardSheet show={showCard} onClose={() => setShowCard(false)} />
-      </div>
-    </div>
-  );
-}
+    // Fix editable text behavior
+    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+        });
+        el.addEventListener('focus', function() {
+            let range = document.createRange();
+            let sel = window.getSelection();
+            range.selectNodeContents(this);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        });
+    });
+</script>
+</body>
+</html>
