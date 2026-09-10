@@ -123,7 +123,8 @@
         display: flex; justify-content: space-between; position: relative;
         border-bottom: 1px solid #333; margin-bottom: 20px; color: #aaa; font-size: 15px; 
     }
-    .tab { padding-bottom: 12px; flex-grow: 1; text-align: center; cursor: pointer; transition: color 0.3s; }
+    /* FIX: Added flex: 1 1 0; to force strictly equal widths for all tabs */
+    .tab { padding-bottom: 12px; flex: 1 1 0; text-align: center; cursor: pointer; transition: color 0.3s; }
     .tab.active { color: #ff9800; }
     
     .tab-slider {
