@@ -41,6 +41,13 @@
     }
     .icon-wrapper svg { width: 20px; height: 20px; fill: #fff; }
     .dropdown-icon { color: #aaa; font-size: 14px; }
+    
+    .page-header { 
+        display: flex; align-items: center; justify-content: space-between; 
+        margin-top: 15px; margin-bottom: 25px; font-size: 20px; font-weight: 500; 
+    }
+    .back-btn { font-size: 26px; color: #fff; cursor: pointer; padding: 0 10px; margin-left: -10px; }
+    .header-dots { font-size: 24px; color: #aaa; margin-top: -8px; }
 
     /* DASHBOARD STYLES */
     #dashboard-view { display: block; }
@@ -67,6 +74,7 @@
     .grid-item:active { background-color: #333; }
     .item-label { font-size: 13px; font-weight: 600; letter-spacing: 0.5px; }
 
+    /* BOTTOM NAV */
     .bottom-nav {
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
         width: 100%; max-width: 400px; height: 65px; background-color: #161616;
@@ -74,7 +82,7 @@
         padding: 0 40px env(safe-area-inset-bottom) 40px; box-sizing: border-box;
         border-top: 1px solid #222; z-index: 10;
     }
-    .nav-icon { width: 24px; height: 24px; fill: #ff9800; }
+    .nav-icon { width: 24px; height: 24px; fill: #ff9800; cursor: pointer; }
     .center-fab {
         position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
         background-color: #ff9800; width: 55px; height: 55px; border-radius: 50%;
@@ -82,23 +90,52 @@
     }
     .center-fab svg { width: 24px; height: 24px; fill: #000; }
 
-    /* RESULTS PAGE STYLES */
-    #results-wrapper { display: none; padding-bottom: 20px; }
-    .results-header { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 25px; font-size: 20px; font-weight: 500; }
-    .back-btn { font-size: 26px; color: #fff; cursor: pointer; padding: 0 10px; margin-left: -10px; }
-    
+    /* TABS SHARED */
     .tabs { display: flex; justify-content: space-between; border-bottom: 1px solid #333; margin-bottom: 20px; color: #aaa; font-size: 15px; }
     .tab { padding-bottom: 12px; flex-grow: 1; text-align: center; cursor: pointer; }
     .tab.active { color: #ff9800; border-bottom: 2px solid #ff9800; }
     
+    /* EMPTY STATES */
+    .empty-state {
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; margin-top: 100px;
+    }
+    .empty-icon { width: 120px; height: 90px; fill: #d4d4d4; margin-bottom: 25px; }
+    .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
+
+    /* SCHEDULE PAGE STYLES */
+    #schedule-wrapper { display: none; }
+    .date-nav {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 20px; font-size: 15px; font-weight: 500;
+    }
+    .date-nav-arrow { font-size: 18px; color: #fff; cursor: pointer; padding: 0 10px; }
+    .day-list { display: flex; justify-content: space-between; margin-bottom: 40px; }
+    .day-card {
+        background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px;
+        width: 17%; display: flex; flex-direction: column; align-items: center;
+        padding: 12px 0 10px 0; color: #fff; cursor: pointer;
+    }
+    .day-card.active { background-color: #ff9800; border-color: #ff9800; color: #fff; }
+    .day-num {
+        font-size: 18px; font-weight: 500; border-bottom: 1px solid #444;
+        width: 60%; text-align: center; padding-bottom: 6px; margin-bottom: 6px;
+    }
+    .day-card.active .day-num { border-color: rgba(255,255,255,0.4); }
+    .day-name { font-size: 11px; color: #aaa; }
+    .day-card.active .day-name { color: #fff; }
+
+    /* FEES PAGE STYLES */
+    #fees-wrapper { display: none; }
+
+    /* RESULTS PAGE STYLES */
+    #results-wrapper { display: none; padding-bottom: 20px; }
     .year-selector { display: flex; gap: 12px; margin-bottom: 20px; }
     .year-btn { background-color: #111; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; }
     .year-btn.active { background-color: #ffb74d; color: #000; }
-    
     .semester-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; margin-top: 25px; }
     .course-card, .score-card { background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
     .course-card { display: flex; align-items: center; }
-    
     .grade-badge {
         background-color: #1a1a1a; width: 45px; height: 45px; display: flex;
         align-items: center; justify-content: center; border-radius: 10px; font-weight: 600;
@@ -107,7 +144,6 @@
     }
     .grade-badge:focus, .editable-text:focus { outline: none; border-color: #ff9800; background-color: #333; }
     .course-name { flex-grow: 1; font-size: 16px; line-height: 1.4; padding-right: 10px; }
-
     .score-title { text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 20px; }
     .score-row { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 15px; color: #eee; }
     .score-icon { margin-right: 10px; font-size: 18px; color: #ddd; width: 20px; text-align: center; }
@@ -142,17 +178,18 @@
         </div>
 
         <div class="grid-container">
-            <div class="grid-item">
+            <div onclick="openPage('schedule-wrapper')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg></div>
                 <div class="item-label">SCHEDULE</div>
             </div>
-            <div class="grid-item">
+            
+            <!-- FEES BUTTON (Routes to fees-wrapper) -->
+            <div onclick="openPage('fees-wrapper')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
                 <div class="item-label">FEES</div>
             </div>
 
-            <!-- RESULTS BUTTON (Triggers JavaScript function to hide Dashboard and show Results) -->
-            <div onclick="openResults()" class="grid-item">
+            <div onclick="openPage('results-wrapper')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zM2 16h8v-2H2v2zm19.5-4.5L23 13l-6.99 7-4.51-4.5L13 14l3.01 3 5.49-5.5z"/></svg></div>
                 <div class="item-label">RESULTS</div>
             </div>
@@ -161,25 +198,98 @@
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
                 <div class="item-label">EXAMS</div>
             </div>
+            
             <div class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-9 11h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg></div>
                 <div class="item-label">ANNOUNCEMENTS</div>
             </div>
         </div>
+    </div>
 
-        <div class="bottom-nav">
-            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            <div class="center-fab"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
-            <div style="width: 24px;"></div>
+
+    <!-- ================= FEES VIEW ================= -->
+    <div id="fees-wrapper">
+        <div class="page-header">
+            <span class="back-btn" onclick="openPage('dashboard-view')">‹</span>
+            <span>My fees</span>
+            <span style="visibility: hidden; padding: 0 10px;">›</span>
+        </div>
+
+        <!-- Fees Inner Tabs -->
+        <div class="tabs">
+            <div class="tab active" id="tab-accommodation">Accommodation</div>
+            <div class="tab" id="tab-tuition">Tuition and other</div>
+        </div>
+
+        <!-- Accommodation Empty State -->
+        <div id="view-accommodation" class="empty-state">
+            <svg style="width: 100px; height: 100px; fill: #d4d4d4; margin-bottom: 20px;" viewBox="0 0 24 24">
+                <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/>
+            </svg>
+            <div class="empty-text">No accommodation fees</div>
+        </div>
+
+        <!-- Tuition Empty State -->
+        <div id="view-tuition" class="empty-state" style="display: none;">
+            <svg style="width: 100px; height: 100px; fill: #d4d4d4; margin-bottom: 20px;" viewBox="0 0 24 24">
+                <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"/>
+            </svg>
+            <div class="empty-text">No other fees</div>
+        </div>
+    </div>
+
+
+    <!-- ================= SCHEDULE VIEW ================= -->
+    <div id="schedule-wrapper">
+        <div class="page-header">
+            <span class="back-btn" onclick="openPage('dashboard-view')">‹</span>
+            <span>Schedule</span>
+            <span class="header-dots">···</span>
+        </div>
+
+        <div class="date-nav">
+            <span class="date-nav-arrow">‹</span>
+            <span>Thursday, 10 September 2026</span>
+            <span class="date-nav-arrow">›</span>
+        </div>
+
+        <div class="day-list">
+            <div class="day-card">
+                <div class="day-num">07</div>
+                <div class="day-name">Mon</div>
+            </div>
+            <div class="day-card">
+                <div class="day-num">08</div>
+                <div class="day-name">Tue</div>
+            </div>
+            <div class="day-card">
+                <div class="day-num">09</div>
+                <div class="day-name">Wed</div>
+            </div>
+            <div class="day-card active">
+                <div class="day-num">10</div>
+                <div class="day-name">Thu</div>
+            </div>
+            <div class="day-card">
+                <div class="day-num">11</div>
+                <div class="day-name">Fri</div>
+            </div>
+        </div>
+
+        <div class="empty-state">
+            <svg class="empty-icon" viewBox="0 0 100 60">
+                <polygon points="10,60 40,25 65,55" fill="#d4d4d4"/>
+                <polygon points="40,60 65,30 90,60" fill="#d4d4d4"/>
+            </svg>
+            <div class="empty-text">It's a free day, just for fun :-)</div>
         </div>
     </div>
 
 
     <!-- ================= RESULTS VIEW ================= -->
     <div id="results-wrapper">
-        <div class="results-header">
-            <!-- BACK BUTTON (Triggers JS to hide Results and show Dashboard) -->
-            <span class="back-btn" onclick="openDashboard()">‹</span>
+        <div class="page-header">
+            <span class="back-btn" onclick="openPage('dashboard-view')">‹</span>
             <span>Results</span>
             <span style="visibility: hidden;">›</span>
         </div>
@@ -190,7 +300,6 @@
             <div class="tab">Scholarships</div>
         </div>
 
-        <!-- GRADES TAB -->
         <div id="view-grades">
             <div class="year-selector">
                 <button class="year-btn active">2025-2026</button>
@@ -220,7 +329,6 @@
             </div>
         </div>
 
-        <!-- SCORES TAB -->
         <div id="view-scores" style="display: none;">
             <div class="score-card">
                 <div class="score-title">An universitar 2024-2025 (I)</div>
@@ -243,26 +351,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Persistent Bottom Navigation -->
+    <div class="bottom-nav">
+        <!-- Tapping home returns to dashboard -->
+        <svg onclick="openPage('dashboard-view')" class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <div class="center-fab"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
+        <div style="width: 24px;"></div>
+    </div>
+
 </div>
 
 <script>
-    // NAVIGATION LOGIC (The SPA Magic)
-    const dashboardView = document.getElementById('dashboard-view');
-    const resultsWrapper = document.getElementById('results-wrapper');
-
-    function openResults() {
-        dashboardView.style.display = 'none';
-        resultsWrapper.style.display = 'block';
-        window.scrollTo(0, 0); // Scroll to top when opening
-    }
-
-    function openDashboard() {
-        resultsWrapper.style.display = 'none';
-        dashboardView.style.display = 'block';
+    // UNIVERSAL ROUTER
+    function openPage(pageId) {
+        // Hide all views
+        document.getElementById('dashboard-view').style.display = 'none';
+        document.getElementById('results-wrapper').style.display = 'none';
+        document.getElementById('schedule-wrapper').style.display = 'none';
+        document.getElementById('fees-wrapper').style.display = 'none';
+        
+        // Show the target view
+        document.getElementById(pageId).style.display = 'block';
         window.scrollTo(0, 0);
     }
 
-    // TAB SWITCHING LOGIC
+    // FEES TAB SWITCHING LOGIC
+    const tabAccommodation = document.getElementById('tab-accommodation');
+    const tabTuition = document.getElementById('tab-tuition');
+    const viewAccommodation = document.getElementById('view-accommodation');
+    const viewTuition = document.getElementById('view-tuition');
+
+    tabAccommodation.addEventListener('click', () => {
+        tabAccommodation.classList.add('active'); tabTuition.classList.remove('active');
+        viewAccommodation.style.display = 'flex'; viewTuition.style.display = 'none'; // 'flex' used because .empty-state needs it to center
+    });
+
+    tabTuition.addEventListener('click', () => {
+        tabTuition.classList.add('active'); tabAccommodation.classList.remove('active');
+        viewTuition.style.display = 'flex'; viewAccommodation.style.display = 'none';
+    });
+
+    // RESULTS TAB SWITCHING LOGIC
     const tabGrades = document.getElementById('tab-grades');
     const tabScores = document.getElementById('tab-scores');
     const viewGrades = document.getElementById('view-grades');
