@@ -17,7 +17,7 @@
         justify-content: center;
         -webkit-user-select: none;
         user-select: none;
-        overflow-x: hidden; /* Prevents horizontal scroll during animations */
+        overflow-x: hidden;
     }
     .app-container {
         width: 100%;
@@ -30,13 +30,9 @@
         overflow-x: hidden;
     }
     
-    /* ANIMATIONS */
-    .slide-in-right {
-        animation: slideInRight 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
-    .slide-in-left {
-        animation: slideInLeft 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
+    /* PAGE ANIMATIONS */
+    .slide-in-right { animation: slideInRight 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+    .slide-in-left { animation: slideInLeft 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
     @keyframes slideInRight {
         0% { transform: translateX(100%); opacity: 0.5; }
@@ -49,14 +45,8 @@
 
     /* SHARED STYLES */
     .icon-wrapper {
-        background-color: #1a1a1a;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 12px;
+        background-color: #1a1a1a; width: 40px; height: 40px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
     }
     .icon-wrapper svg { width: 20px; height: 20px; fill: #fff; }
     .dropdown-icon { color: #aaa; font-size: 14px; }
@@ -68,7 +58,7 @@
     .back-btn { font-size: 26px; color: #fff; cursor: pointer; padding: 0 10px; margin-left: -10px; }
     .header-dots { font-size: 24px; color: #aaa; margin-top: -8px; }
 
-    /* DASHBOARD STYLES */
+    /* DASHBOARD */
     #dashboard-view { display: block; }
     .dash-header { text-align: center; margin-top: 15px; margin-bottom: 25px; font-size: 18px; font-weight: 500; }
     .hero-card {
@@ -87,8 +77,7 @@
     .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .grid-item {
         background-color: #242424; border-radius: 12px; padding: 25px 10px;
-        display: flex; flex-direction: column; align-items: center;
-        justify-content: center; color: #fff; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; cursor: pointer;
     }
     .grid-item:active { background-color: #333; }
     .item-label { font-size: 13px; font-weight: 600; letter-spacing: 0.5px; }
@@ -109,10 +98,24 @@
     }
     .center-fab svg { width: 24px; height: 24px; fill: #000; }
 
-    /* TABS SHARED */
-    .tabs { display: flex; justify-content: space-between; border-bottom: 1px solid #333; margin-bottom: 20px; color: #aaa; font-size: 15px; }
-    .tab { padding-bottom: 12px; flex-grow: 1; text-align: center; cursor: pointer; }
-    .tab.active { color: #ff9800; border-bottom: 2px solid #ff9800; }
+    /* GLIDING TABS */
+    .tabs { 
+        display: flex; justify-content: space-between; position: relative;
+        border-bottom: 1px solid #333; margin-bottom: 20px; color: #aaa; font-size: 15px; 
+    }
+    .tab { padding-bottom: 12px; flex-grow: 1; text-align: center; cursor: pointer; transition: color 0.3s; }
+    .tab.active { color: #ff9800; }
+    
+    /* The magic sliding bar */
+    .tab-slider {
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        height: 2px;
+        background-color: #ff9800;
+        transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        z-index: 2;
+    }
     
     /* EMPTY STATES */
     .empty-state {
@@ -122,33 +125,24 @@
     .empty-icon { width: 120px; height: 90px; fill: #d4d4d4; margin-bottom: 25px; }
     .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
 
-    /* SCHEDULE PAGE STYLES */
-    #schedule-wrapper { display: none; }
-    .date-nav {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 20px; font-size: 15px; font-weight: 500;
-    }
+    /* PAGE WRAPPERS */
+    #schedule-wrapper, #fees-wrapper, #results-wrapper { display: none; padding-bottom: 20px;}
+
+    /* SCHEDULE */
+    .date-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
     .date-nav-arrow { font-size: 18px; color: #fff; cursor: pointer; padding: 0 10px; }
     .day-list { display: flex; justify-content: space-between; margin-bottom: 40px; }
     .day-card {
-        background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px;
-        width: 17%; display: flex; flex-direction: column; align-items: center;
-        padding: 12px 0 10px 0; color: #fff; cursor: pointer;
+        background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px; width: 17%; 
+        display: flex; flex-direction: column; align-items: center; padding: 12px 0 10px 0; color: #fff; cursor: pointer; transition: all 0.3s;
     }
-    .day-card.active { background-color: #ff9800; border-color: #ff9800; color: #fff; }
-    .day-num {
-        font-size: 18px; font-weight: 500; border-bottom: 1px solid #444;
-        width: 60%; text-align: center; padding-bottom: 6px; margin-bottom: 6px;
-    }
+    .day-card.active { background-color: #ff9800; border-color: #ff9800; color: #fff; transform: scale(1.05); }
+    .day-num { font-size: 18px; font-weight: 500; border-bottom: 1px solid #444; width: 60%; text-align: center; padding-bottom: 6px; margin-bottom: 6px; }
     .day-card.active .day-num { border-color: rgba(255,255,255,0.4); }
     .day-name { font-size: 11px; color: #aaa; }
     .day-card.active .day-name { color: #fff; }
 
-    /* FEES PAGE STYLES */
-    #fees-wrapper { display: none; }
-
-    /* RESULTS PAGE STYLES */
-    #results-wrapper { display: none; padding-bottom: 20px; }
+    /* RESULTS */
     .year-selector { display: flex; gap: 12px; margin-bottom: 20px; }
     .year-btn { background-color: #111; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; }
     .year-btn.active { background-color: #ffb74d; color: #000; }
@@ -156,9 +150,8 @@
     .course-card, .score-card { background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
     .course-card { display: flex; align-items: center; }
     .grade-badge {
-        background-color: #1a1a1a; width: 45px; height: 45px; display: flex;
-        align-items: center; justify-content: center; border-radius: 10px; font-weight: 600;
-        margin-right: 15px; font-size: 16px; border: 1px solid #333;
+        background-color: #1a1a1a; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; 
+        border-radius: 10px; font-weight: 600; margin-right: 15px; font-size: 16px; border: 1px solid #333;
         -webkit-user-select: text; user-select: text; caret-color: #ff9800; flex-shrink: 0;
     }
     .grade-badge:focus, .editable-text:focus { outline: none; border-color: #ff9800; background-color: #333; }
@@ -169,8 +162,8 @@
     .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; margin-top: 20px; }
     .score-grid-title { font-size: 15px; margin-bottom: 8px; color: #eee; }
     .score-pill {
-        background-color: #161616; border-radius: 10px; padding: 10px; font-weight: 500;
-        margin-bottom: 8px; border: 1px solid #2a2a2a; -webkit-user-select: text; user-select: text; caret-color: #ff9800;
+        background-color: #161616; border-radius: 10px; padding: 10px; font-weight: 500; margin-bottom: 8px; 
+        border: 1px solid #2a2a2a; -webkit-user-select: text; user-select: text; caret-color: #ff9800;
     }
     .score-credits { font-size: 13px; color: #aaa; }
     .editable-text { -webkit-user-select: text; user-select: text; caret-color: #ff9800; padding: 0 2px; border-radius: 4px; }
@@ -201,22 +194,18 @@
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg></div>
                 <div class="item-label">SCHEDULE</div>
             </div>
-            
             <div onclick="openPage('fees-wrapper', 'forward')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
                 <div class="item-label">FEES</div>
             </div>
-
             <div onclick="openPage('results-wrapper', 'forward')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zM2 16h8v-2H2v2zm19.5-4.5L23 13l-6.99 7-4.51-4.5L13 14l3.01 3 5.49-5.5z"/></svg></div>
                 <div class="item-label">RESULTS</div>
             </div>
-
             <div class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
                 <div class="item-label">EXAMS</div>
             </div>
-            
             <div class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-9 11h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg></div>
                 <div class="item-label">ANNOUNCEMENTS</div>
@@ -233,9 +222,11 @@
             <span style="visibility: hidden; padding: 0 10px;">›</span>
         </div>
 
-        <div class="tabs">
-            <div class="tab active" id="tab-accommodation">Accommodation</div>
-            <div class="tab" id="tab-tuition">Tuition and other</div>
+        <div class="tabs" id="fees-tabs">
+            <div class="tab active">Accommodation</div>
+            <div class="tab">Tuition and other</div>
+            <!-- The gliding indicator (50% width since there are 2 tabs) -->
+            <div class="tab-slider" id="fees-slider" style="width: 50%; transform: translateX(0%);"></div>
         </div>
 
         <div id="view-accommodation" class="empty-state">
@@ -268,27 +259,12 @@
             <span class="date-nav-arrow">›</span>
         </div>
 
-        <div class="day-list">
-            <div class="day-card">
-                <div class="day-num">07</div>
-                <div class="day-name">Mon</div>
-            </div>
-            <div class="day-card">
-                <div class="day-num">08</div>
-                <div class="day-name">Tue</div>
-            </div>
-            <div class="day-card">
-                <div class="day-num">09</div>
-                <div class="day-name">Wed</div>
-            </div>
-            <div class="day-card active">
-                <div class="day-num">10</div>
-                <div class="day-name">Thu</div>
-            </div>
-            <div class="day-card">
-                <div class="day-num">11</div>
-                <div class="day-name">Fri</div>
-            </div>
+        <div class="day-list" id="schedule-days">
+            <div class="day-card"><div class="day-num">07</div><div class="day-name">Mon</div></div>
+            <div class="day-card"><div class="day-num">08</div><div class="day-name">Tue</div></div>
+            <div class="day-card"><div class="day-num">09</div><div class="day-name">Wed</div></div>
+            <div class="day-card active"><div class="day-num">10</div><div class="day-name">Thu</div></div>
+            <div class="day-card"><div class="day-num">11</div><div class="day-name">Fri</div></div>
         </div>
 
         <div class="empty-state">
@@ -309,10 +285,12 @@
             <span style="visibility: hidden;">›</span>
         </div>
 
-        <div class="tabs">
-            <div class="tab active" id="tab-grades">Grades</div>
-            <div class="tab" id="tab-scores">Scores</div>
+        <div class="tabs" id="results-tabs">
+            <div class="tab active">Grades</div>
+            <div class="tab">Scores</div>
             <div class="tab">Scholarships</div>
+            <!-- The gliding indicator (33.33% width since there are 3 tabs) -->
+            <div class="tab-slider" id="results-slider" style="width: 33.33%; transform: translateX(0%);"></div>
         </div>
 
         <div id="view-grades">
@@ -332,15 +310,11 @@
                 <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Mecanică II</div><div class="dropdown-icon">▼</div></div>
                 <div class="course-card"><div class="grade-badge" contenteditable="true">9</div><div class="course-name">Limba franceză 3</div><div class="dropdown-icon">▼</div></div>
             </div>
-
+            
             <div class="semester-title">Semester 2</div>
             <div class="course-list">
                 <div class="course-card"><div class="grade-badge" contenteditable="true">8</div><div class="course-name">Mecanisme</div><div class="dropdown-icon">▼</div></div>
                 <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Mecanica fluidelor și mașini hidraulice</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Rezistența materialelor II</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">5</div><div class="course-name">Organe de mașini I</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">AD</div><div class="course-name">Educație fizică și sport IV</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">8</div><div class="course-name">Toleranțe și control dimensional</div><div class="dropdown-icon">▼</div></div>
             </div>
         </div>
 
@@ -348,28 +322,22 @@
             <div class="score-card">
                 <div class="score-title">An universitar 2024-2025 (I)</div>
                 <div class="score-row"><span class="score-icon">★</span><span>Final score: <span class="editable-text" contenteditable="true">7.05</span></span></div>
-                <div class="score-row"><span class="score-icon">🎓</span><span>School situation: <span class="editable-text" contenteditable="true">Promovat (integralist)</span></span></div>
-                <div class="score-row"><span class="score-icon">≡</span><span>Specialisation: Autovehicule rutiere- limba engleza</span></div>
+                <div class="score-row"><span class="score-icon">🎓</span><span>School situation: <span class="editable-text" contenteditable="true">Promovat</span></span></div>
                 <div class="score-grid">
-                    <div><div class="score-grid-title">Semester I</div><div class="score-pill" contenteditable="true">8.03</div><div class="score-credits">30 credits</div></div>
-                    <div><div class="score-grid-title">Semester II</div><div class="score-pill" contenteditable="true">6.06</div><div class="score-credits">30 credits</div></div>
+                    <div><div class="score-grid-title">Semester I</div><div class="score-pill" contenteditable="true">8.03</div></div>
+                    <div><div class="score-grid-title">Semester II</div><div class="score-pill" contenteditable="true">6.06</div></div>
                 </div>
             </div>
+        </div>
 
-            <div class="score-card">
-                <div class="score-title">An universitar 2025-2026 (II)</div>
-                <div class="score-row"><span class="score-icon">≡</span><span>Specialisation: Autovehicule rutiere- în limba engleză</span></div>
-                <div class="score-grid">
-                    <div><div class="score-grid-title">Semester I</div><div class="score-pill" contenteditable="true">No average</div><div class="score-credits">24 credits</div></div>
-                    <div><div class="score-grid-title">Semester II</div><div class="score-pill" contenteditable="true">No average</div><div class="score-credits">12 credits</div></div>
-                </div>
-            </div>
+        <!-- Placeholder for Scholarships -->
+        <div id="view-scholarships" class="empty-state" style="display: none;">
+            <div class="empty-text">No active scholarships</div>
         </div>
     </div>
 
     <!-- Persistent Bottom Navigation -->
     <div class="bottom-nav">
-        <!-- Tapping home returns to dashboard -->
         <svg onclick="openPage('dashboard-view', 'back')" class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         <div class="center-fab"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
         <div style="width: 24px;"></div>
@@ -378,65 +346,101 @@
 </div>
 
 <script>
-    // UNIVERSAL ROUTER WITH ANIMATION SUPPORT
+    // PAGE ROUTER
     function openPage(pageId, direction) {
-        // List of all main page containers
         const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper'];
-        
-        // Hide all views and remove animation classes
         pages.forEach(id => {
             const el = document.getElementById(id);
             el.style.display = 'none';
             el.classList.remove('slide-in-right', 'slide-in-left');
         });
         
-        // Show the target view
         const target = document.getElementById(pageId);
         target.style.display = 'block';
-        
-        // Apply the correct sliding animation
-        if (direction === 'forward') {
-            target.classList.add('slide-in-right');
-        } else if (direction === 'back') {
-            target.classList.add('slide-in-left');
-        }
-        
+        if (direction === 'forward') target.classList.add('slide-in-right');
+        else if (direction === 'back') target.classList.add('slide-in-left');
         window.scrollTo(0, 0);
     }
 
-    // FEES TAB SWITCHING LOGIC
-    const tabAccommodation = document.getElementById('tab-accommodation');
-    const tabTuition = document.getElementById('tab-tuition');
-    const viewAccommodation = document.getElementById('view-accommodation');
-    const viewTuition = document.getElementById('view-tuition');
+    // --- SWIPE GESTURE DETECTOR ---
+    // This allows you to swipe left/right to trigger actions without tapping buttons
+    function attachSwipeListener(wrapperId, onSwipeLeft, onSwipeRight) {
+        const wrapper = document.getElementById(wrapperId);
+        let startX = 0, startY = 0, endX = 0, endY = 0;
 
-    tabAccommodation.addEventListener('click', () => {
-        tabAccommodation.classList.add('active'); tabTuition.classList.remove('active');
-        viewAccommodation.style.display = 'flex'; viewTuition.style.display = 'none'; 
-    });
+        wrapper.addEventListener('touchstart', e => {
+            startX = e.changedTouches[0].screenX;
+            startY = e.changedTouches[0].screenY;
+        }, {passive: true});
 
-    tabTuition.addEventListener('click', () => {
-        tabTuition.classList.add('active'); tabAccommodation.classList.remove('active');
-        viewTuition.style.display = 'flex'; viewAccommodation.style.display = 'none';
-    });
+        wrapper.addEventListener('touchend', e => {
+            endX = e.changedTouches[0].screenX;
+            endY = e.changedTouches[0].screenY;
+            
+            // Check if horizontal swipe is much larger than vertical swipe (avoids accidental triggers when scrolling)
+            const diffX = Math.abs(endX - startX);
+            const diffY = Math.abs(endY - startY);
+            
+            if (diffX > 50 && diffX > diffY) {
+                if (endX < startX) onSwipeLeft();   // Swiped left (go next)
+                if (endX > startX) onSwipeRight(); // Swiped right (go previous)
+            }
+        }, {passive: true});
+    }
 
-    // RESULTS TAB SWITCHING LOGIC
-    const tabGrades = document.getElementById('tab-grades');
-    const tabScores = document.getElementById('tab-scores');
-    const viewGrades = document.getElementById('view-grades');
-    const viewScores = document.getElementById('view-scores');
+    // --- FEES TAB LOGIC (With Glide) ---
+    let feesIndex = 0;
+    const feesTabs = document.querySelectorAll('#fees-tabs .tab');
+    function setFeesTab(index) {
+        if (index < 0 || index > 1) return;
+        feesIndex = index;
+        
+        // Update active class
+        feesTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+        // Move sliding bar (0% or 100%)
+        document.getElementById('fees-slider').style.transform = `translateX(${index * 100}%)`;
+        
+        // Switch Views
+        document.getElementById('view-accommodation').style.display = index === 0 ? 'flex' : 'none';
+        document.getElementById('view-tuition').style.display = index === 1 ? 'flex' : 'none';
+    }
+    // Allow tapping on the tabs
+    feesTabs.forEach((tab, i) => tab.addEventListener('click', () => setFeesTab(i)));
+    // Allow swiping on the page
+    attachSwipeListener('fees-wrapper', () => setFeesTab(feesIndex + 1), () => setFeesTab(feesIndex - 1));
 
-    tabGrades.addEventListener('click', () => {
-        tabGrades.classList.add('active'); tabScores.classList.remove('active');
-        viewGrades.style.display = 'block'; viewScores.style.display = 'none';
-    });
 
-    tabScores.addEventListener('click', () => {
-        tabScores.classList.add('active'); tabGrades.classList.remove('active');
-        viewScores.style.display = 'block'; viewGrades.style.display = 'none';
-    });
+    // --- RESULTS TAB LOGIC (With Glide) ---
+    let resultsIndex = 0;
+    const resultsTabs = document.querySelectorAll('#results-tabs .tab');
+    function setResultsTab(index) {
+        if (index < 0 || index > 2) return;
+        resultsIndex = index;
+        
+        resultsTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+        document.getElementById('results-slider').style.transform = `translateX(${index * 100}%)`;
+        
+        document.getElementById('view-grades').style.display = index === 0 ? 'block' : 'none';
+        document.getElementById('view-scores').style.display = index === 1 ? 'block' : 'none';
+        document.getElementById('view-scholarships').style.display = index === 2 ? 'flex' : 'none';
+    }
+    resultsTabs.forEach((tab, i) => tab.addEventListener('click', () => setResultsTab(i)));
+    attachSwipeListener('results-wrapper', () => setResultsTab(resultsIndex + 1), () => setResultsTab(resultsIndex - 1));
 
-    // EDITABLE TEXT BEHAVIOR
+
+    // --- SCHEDULE LOGIC (Swipe to change days) ---
+    let scheduleIndex = 3; // Starts on Thursday (index 3)
+    const scheduleDays = document.querySelectorAll('.day-card');
+    function setScheduleDay(index) {
+        if (index < 0 || index > 4) return;
+        scheduleIndex = index;
+        scheduleDays.forEach((card, i) => card.classList.toggle('active', i === index));
+    }
+    scheduleDays.forEach((card, i) => card.addEventListener('click', () => setScheduleDay(i)));
+    attachSwipeListener('schedule-wrapper', () => setScheduleDay(scheduleIndex + 1), () => setScheduleDay(scheduleIndex - 1));
+
+
+    // Fix editable text behavior
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
         el.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
