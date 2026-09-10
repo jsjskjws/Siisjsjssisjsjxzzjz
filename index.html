@@ -44,6 +44,19 @@
         100% { transform: translateX(0); opacity: 1; }
     }
 
+    /* TAB CONTENT ANIMATIONS */
+    .tab-slide-forward { animation: tabSlideForward 0.25s ease-out forwards; }
+    .tab-slide-backward { animation: tabSlideBackward 0.25s ease-out forwards; }
+    
+    @keyframes tabSlideForward {
+        0% { opacity: 0; transform: translateX(15px); }
+        100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes tabSlideBackward {
+        0% { opacity: 0; transform: translateX(-15px); }
+        100% { opacity: 1; transform: translateX(0); }
+    }
+
     /* SHARED STYLES */
     .icon-wrapper {
         background-color: #1a1a1a; width: 40px; height: 40px; border-radius: 10px;
@@ -53,16 +66,15 @@
     .dropdown-icon { color: #aaa; font-size: 14px; }
     
     .page-header { 
-        display: flex; align-items: center; justify-content: center; 
-        position: relative;
+        display: grid; 
+        grid-template-columns: 1fr auto 1fr; 
+        align-items: center; 
         margin-top: 15px; margin-bottom: 25px; font-size: 20px; font-weight: 500; 
     }
     .back-btn { 
-        position: absolute; left: 0; top: 50%; transform: translateY(-50%);
         font-size: 26px; color: #fff; cursor: pointer; padding: 0 10px; margin-left: -10px; 
     }
     .header-dots { 
-        position: absolute; right: 0; top: 50%; transform: translateY(-50%);
         font-size: 24px; color: #aaa; margin-top: -4px; 
     }
 
@@ -227,8 +239,9 @@
     <!-- ================= FEES VIEW ================= -->
     <div id="fees-wrapper" class="page-view">
         <div class="page-header">
-            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
-            <span>My fees</span>
+            <div style="text-align: left;"><span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span></div>
+            <div style="text-align: center;">My fees</div>
+            <div style="text-align: right;"></div>
         </div>
 
         <div class="tabs" id="fees-tabs">
@@ -256,9 +269,9 @@
     <!-- ================= SCHEDULE VIEW ================= -->
     <div id="schedule-wrapper" class="page-view">
         <div class="page-header">
-            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
-            <span>Schedule</span>
-            <span class="header-dots">···</span>
+            <div style="text-align: left;"><span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span></div>
+            <div style="text-align: center;">Schedule</div>
+            <div style="text-align: right;"><span class="header-dots">···</span></div>
         </div>
 
         <div class="date-nav">
@@ -288,8 +301,9 @@
     <!-- ================= RESULTS VIEW ================= -->
     <div id="results-wrapper" class="page-view">
         <div class="page-header">
-            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
-            <span>Results</span>
+            <div style="text-align: left;"><span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span></div>
+            <div style="text-align: center;">Results</div>
+            <div style="text-align: right;"></div>
         </div>
 
         <div class="tabs" id="results-tabs">
@@ -426,13 +440,25 @@
     const feesTabs = document.querySelectorAll('#fees-tabs .tab');
     function setFeesTab(index) {
         if (index < 0 || index > 1) return;
+        const oldIndex = feesIndex;
         feesIndex = index;
         
         feesTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
         document.getElementById('fees-slider').style.transform = `translateX(${index * 100}%)`;
         
-        document.getElementById('view-accommodation').style.display = index === 0 ? 'flex' : 'none';
-        document.getElementById('view-tuition').style.display = index === 1 ? 'flex' : 'none';
+        const views = ['view-accommodation', 'view-tuition'];
+        views.forEach((id, i) => {
+            const el = document.getElementById(id);
+            if (i === index) {
+                el.style.display = 'flex';
+                el.classList.remove('tab-slide-forward', 'tab-slide-backward');
+                // Trigger reflow to restart animation
+                void el.offsetWidth;
+                el.classList.add(index > oldIndex ? 'tab-slide-forward' : 'tab-slide-backward');
+            } else {
+                el.style.display = 'none';
+            }
+        });
     }
     feesTabs.forEach((tab, i) => tab.addEventListener('click', () => setFeesTab(i)));
 
@@ -442,14 +468,25 @@
     const resultsTabs = document.querySelectorAll('#results-tabs .tab');
     function setResultsTab(index) {
         if (index < 0 || index > 2) return;
+        const oldIndex = resultsIndex;
         resultsIndex = index;
         
         resultsTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
         document.getElementById('results-slider').style.transform = `translateX(${index * 100}%)`;
         
-        document.getElementById('view-grades').style.display = index === 0 ? 'block' : 'none';
-        document.getElementById('view-scores').style.display = index === 1 ? 'block' : 'none';
-        document.getElementById('view-scholarships').style.display = index === 2 ? 'flex' : 'none';
+        const views = ['view-grades', 'view-scores', 'view-scholarships'];
+        views.forEach((id, i) => {
+            const el = document.getElementById(id);
+            if (i === index) {
+                el.style.display = id === 'view-scholarships' ? 'flex' : 'block';
+                el.classList.remove('tab-slide-forward', 'tab-slide-backward');
+                // Trigger reflow to restart animation
+                void el.offsetWidth;
+                el.classList.add(index > oldIndex ? 'tab-slide-forward' : 'tab-slide-backward');
+            } else {
+                el.style.display = 'none';
+            }
+        });
     }
     resultsTabs.forEach((tab, i) => tab.addEventListener('click', () => setResultsTab(i)));
 
