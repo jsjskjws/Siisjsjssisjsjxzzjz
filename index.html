@@ -123,7 +123,6 @@
         display: flex; justify-content: space-between; position: relative;
         border-bottom: 1px solid #333; margin-bottom: 20px; color: #aaa; font-size: 15px; 
     }
-    /* FIX: Added flex: 1 1 0; to force strictly equal widths for all tabs */
     .tab { padding-bottom: 12px; flex: 1 1 0; text-align: center; cursor: pointer; transition: color 0.3s; }
     .tab.active { color: #ff9800; }
     
@@ -149,7 +148,7 @@
     .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
 
     /* PAGE WRAPPERS */
-    #schedule-wrapper, #fees-wrapper, #results-wrapper { display: none; padding-bottom: 20px; min-height: 100%;}
+    #schedule-wrapper, #fees-wrapper, #results-wrapper, #announcements-wrapper { display: none; padding-bottom: 20px; min-height: 100%;}
 
     /* SCHEDULE */
     .date-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
@@ -190,6 +189,43 @@
     }
     .score-credits { font-size: 13px; color: #aaa; }
     .editable-text { -webkit-user-select: text; user-select: text; caret-color: #ff9800; padding: 0 2px; border-radius: 4px; }
+
+    /* ANNOUNCEMENTS */
+    .announcement-card {
+        background-color: #242424;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #d4d4d4;
+        -webkit-user-select: text;
+        user-select: text;
+    }
+    .announcement-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 12px;
+    }
+    .announcement-link {
+        color: #d67a28; /* Matching the orange/brown link color */
+        text-decoration: underline;
+        word-break: break-all;
+    }
+    .announcement-footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 18px;
+        font-size: 13px;
+        color: #aaa;
+    }
+    .announcement-footer svg {
+        width: 16px;
+        height: 16px;
+        fill: #aaa;
+    }
 </style>
 </head>
 <body>
@@ -229,9 +265,65 @@
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
                 <div class="item-label">EXAMS</div>
             </div>
-            <div class="grid-item">
+            <div onclick="openPage('announcements-wrapper', 'forward')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-9 11h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg></div>
                 <div class="item-label">ANNOUNCEMENTS</div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= ANNOUNCEMENTS VIEW ================= -->
+    <div id="announcements-wrapper" class="page-view">
+        <div class="page-header">
+            <div style="text-align: left;"><span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span></div>
+            <div style="text-align: center; font-size: 18px;">Secretariat Announcements</div>
+            <div style="text-align: right;"></div>
+        </div>
+
+        <!-- Repeated Cards as seen in screenshot -->
+        <div class="announcement-card">
+            <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
+            <div>
+                Vă anunțăm ca s-a afișat Programarea restanțelor și reexaminărilor TOAMNĂ 2026 pe site-ul facultății la secțiunea Programarea examenelor.<br>
+                <a class="announcement-link">mecanica.unitbv.ro/images/studenti/examene/2026.09/Sesiune_restante_si_reexaminari_toamna_2026.pdf</a><br>
+                <a class="announcement-link">mecanica.unitbv.ro/ro/studenti/programarea-examenelor.html</a>
+                Vă rugăm sa verificați frecvent pe site deoarece există posibilitatea ca până în septembrie să se mai modifice unele date de examene, ore, sali. Pentru fiecare cadru didactic există 2 date de examen. Vă rugăm sa țineți cont de această planificare și nu de cea de pe intranet unde se trece doar o singură dată de examen în vederea generării catalogului de note.<br>
+                Secretar șef Ing. Andreea Nuț
+            </div>
+            <div class="announcement-footer">
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                <span>Publish date: 09.07.2026 11:45</span>
+            </div>
+        </div>
+
+        <div class="announcement-card">
+            <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
+            <div>
+                Vă anunțăm ca s-a afișat Programarea restanțelor și reexaminărilor TOAMNĂ 2026 pe site-ul facultății la secțiunea Programarea examenelor.<br>
+                <a class="announcement-link">mecanica.unitbv.ro/images/studenti/examene/2026.09/Sesiune_restante_si_reexaminari_toamna_2026.pdf</a><br>
+                <a class="announcement-link">mecanica.unitbv.ro/ro/studenti/programarea-examenelor.html</a>
+                Vă rugăm sa verificați frecvent pe site deoarece există posibilitatea ca până în septembrie să se mai modifice unele date de examene, ore, sali. Pentru fiecare cadru didactic există 2 date de examen. Vă rugăm sa țineți cont de această planificare și nu de cea de pe intranet unde se trece doar o singură dată de examen în vederea generării catalogului de note.<br>
+                Secretar șef Ing. Andreea Nuț
+            </div>
+            <div class="announcement-footer">
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                <span>Publish date: 09.07.2026 11:43</span>
+            </div>
+        </div>
+        
+        <div class="announcement-card">
+            <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
+            <div>
+                Vă anunțăm ca s-a afișat Programarea restanțelor și reexaminărilor TOAMNĂ 2026 pe site-ul facultății la secțiunea Programarea examenelor.<br>
+                <a class="announcement-link">mecanica.unitbv.ro/images/studenti/examene/2026.09/Sesiune_restante_si_reexaminari_toamna_2026.pdf</a><br>
+                <a class="announcement-link">mecanica.unitbv.ro/ro/studenti/programarea-examenelor.html</a>
+                Vă rugăm sa verificați frecvent pe site deoarece există posibilitatea ca până în septembrie să se mai modifice unele date de examene, ore, sali. Pentru fiecare cadru didactic există 2 date de examen. Vă rugăm sa țineți cont de această planificare și nu de cea de pe intranet unde se trece doar o singură dată de examen în vederea generării catalogului de note.<br>
+                Secretar șef Ing. Andreea Nuț
+            </div>
+            <div class="announcement-footer">
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                <span>Publish date: 09.07.2026 11:37</span>
             </div>
         </div>
     </div>
@@ -372,7 +464,7 @@
     // --- PAGE ROUTER ---
     function openPage(pageId, direction) {
         window.activePage = pageId;
-        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper'];
+        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper', 'announcements-wrapper'];
         pages.forEach(id => {
             const el = document.getElementById(id);
             el.style.display = 'none';
@@ -416,7 +508,7 @@
                 // 2. Normal swiping between inner tabs
                 if (window.activePage === 'fees-wrapper') {
                     if (feesIndex > 0) setFeesTab(feesIndex - 1);
-                    else openPage('dashboard-view', 'back'); // Fallback: swipe right on first tab goes to dashboard
+                    else openPage('dashboard-view', 'back');
                 } else if (window.activePage === 'results-wrapper') {
                     if (resultsIndex > 0) setResultsTab(resultsIndex - 1);
                     else openPage('dashboard-view', 'back');
