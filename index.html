@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Dashboard</title>
+<!-- Make sure your icon.png is still in the folder so this page uses it too! -->
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+    body {
+        background-color: #121212;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    .app-container {
+        width: 100%;
+        max-width: 400px; /* Keeps it phone-sized on desktop */
+        background-color: #1a1a1a;
+        min-height: 100vh;
+        padding: env(safe-area-inset-top) 20px 80px 20px; /* Extra bottom padding for nav */
+        box-sizing: border-box;
+        position: relative;
+    }
+    .header {
+        text-align: center;
+        margin-top: 15px;
+        margin-bottom: 25px;
+        font-size: 18px;
+        font-weight: 500;
+    }
+    
+    /* Hero Card (Transilvania University) */
+    .hero-card {
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+        border-radius: 12px;
+        padding: 25px 20px;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    /* Simulated background image overlay */
+    .hero-card::after {
+        content: '';
+        position: absolute;
+        right: -30px;
+        top: -30px;
+        width: 200px;
+        height: 200px;
+        background-color: #333;
+        border-radius: 50%;
+        opacity: 0.2;
+    }
+    .univ-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        font-size: 8px;
+        color: #ccc;
+        z-index: 2;
+    }
+    .univ-logo-icon {
+        width: 24px;
+        height: 24px;
+        background-color: #fff;
+        border-radius: 4px;
+    }
+    .hero-title {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.2;
+        z-index: 2;
+    }
+
+    /* Grid Layout */
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    .grid-item {
+        background-color: #242424;
+        border-radius: 12px;
+        padding: 25px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #fff;
+        transition: background-color 0.2s;
+    }
+    .grid-item:active {
+        background-color: #333;
+    }
+    .icon-wrapper {
+        background-color: #1a1a1a;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+    }
+    .icon-wrapper svg {
+        width: 20px;
+        height: 20px;
+        fill: #fff;
+    }
+    .item-label {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 400px;
+        height: 65px;
+        background-color: #161616;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px env(safe-area-inset-bottom) 40px;
+        box-sizing: border-box;
+        border-top: 1px solid #222;
+        z-index: 10;
+    }
+    .nav-icon {
+        width: 24px;
+        height: 24px;
+        fill: #ff9800; /* Active orange color for Home */
+    }
+    .center-fab {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ff9800;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .center-fab svg {
+        width: 24px;
+        height: 24px;
+        fill: #000;
+    }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">Dashboard</div>
+
+    <!-- Hero Card -->
+    <div class="hero-card">
+        <div class="univ-logo">
+            <!-- Simple simulated logo block -->
+            <div style="display: flex; gap: 2px;">
+                <div style="width: 4px; height: 16px; background: #fff;"></div>
+                <div style="width: 4px; height: 16px; background: #fff;"></div>
+                <div style="width: 4px; height: 16px; background: #fff;"></div>
+            </div>
+            <span>Transilvania<br>University<br>of Brașov</span>
+        </div>
+        <div class="hero-title">
+            TRANSILVANIA<br>University<br>of Brașov
+        </div>
+    </div>
+
+    <!-- Menu Grid -->
+    <div class="grid-container">
+        <div class="grid-item">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+            </div>
+            <div class="item-label">SCHEDULE</div>
+        </div>
+        
+        <div class="grid-item">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+            </div>
+            <div class="item-label">FEES</div>
+        </div>
+
+        <!-- This card links directly to your Results page -->
+        <a href="results.html" class="grid-item">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zM2 16h8v-2H2v2zm19.5-4.5L23 13l-6.99 7-4.51-4.5L13 14l3.01 3 5.49-5.5z"/></svg>
+            </div>
+            <div class="item-label">RESULTS</div>
+        </a>
+
+        <div class="grid-item">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <div class="item-label">EXAMS</div>
+        </div>
+
+        <div class="grid-item">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-9 11h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg>
+            </div>
+            <div class="item-label">ANNOUNCEMENTS</div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <!-- Home Icon -->
+        <svg class="nav-icon" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+        
+        <!-- Center Floating Action Button -->
+        <div class="center-fab">
+            <svg viewBox="0 0 24 24">
+                <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+            </svg>
+        </div>
+        
+        <!-- Empty space to balance the home icon, since you wanted the right side icons removed -->
+        <div style="width: 24px;"></div>
+    </div>
+</div>
+
+</body>
+</html>
