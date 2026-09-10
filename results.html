@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Results</title>
+<style>
+    body {
+        background-color: #121212;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    .app-container {
+        width: 100%;
+        background-color: #1a1a1a;
+        min-height: 100vh;
+        padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+        box-sizing: border-box;
+    }
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 15px;
+        margin-bottom: 25px;
+        font-size: 20px;
+        font-weight: 500;
+    }
+    .back-btn {
+        font-size: 22px;
+        color: #fff;
+    }
+    .tabs {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #333;
+        margin-bottom: 20px;
+        color: #aaa;
+        font-size: 15px;
+    }
+    .tab {
+        padding-bottom: 12px;
+        flex-grow: 1;
+        text-align: center;
+        cursor: pointer;
+    }
+    .tab.active {
+        color: #ff9800;
+        border-bottom: 2px solid #ff9800;
+    }
+    .year-selector {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .year-btn {
+        background-color: #111;
+        color: #fff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .year-btn.active {
+        background-color: #ffb74d;
+        color: #000;
+    }
+    .semester-title {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        margin-top: 25px;
+    }
+    .course-card, .score-card {
+        background-color: #242424;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    .course-card {
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Grade Badge Styles */
+    .grade-badge {
+        background-color: #1a1a1a;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-weight: 600;
+        margin-right: 15px;
+        font-size: 16px;
+        border: 1px solid #333;
+        -webkit-user-select: text;
+        user-select: text;
+        caret-color: #ff9800;
+        flex-shrink: 0;
+    }
+    .grade-badge:focus, .editable-text:focus {
+        outline: none;
+        border-color: #ff9800;
+        background-color: #333;
+    }
+    .course-name {
+        flex-grow: 1;
+        font-size: 16px;
+        line-height: 1.4;
+        padding-right: 10px;
+    }
+    .dropdown-icon {
+        color: #aaa;
+        font-size: 14px;
+    }
+
+    /* Score Card Styles */
+    .score-title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    .score-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        font-size: 15px;
+        color: #eee;
+    }
+    .score-icon {
+        margin-right: 10px;
+        font-size: 18px;
+        color: #ddd;
+        width: 20px;
+        text-align: center;
+    }
+    .score-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .score-grid-title {
+        font-size: 15px;
+        margin-bottom: 8px;
+        color: #eee;
+    }
+    .score-pill {
+        background-color: #161616;
+        border-radius: 10px;
+        padding: 10px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        border: 1px solid #2a2a2a;
+        -webkit-user-select: text;
+        user-select: text;
+        caret-color: #ff9800;
+    }
+    .score-credits {
+        font-size: 13px;
+        color: #aaa;
+    }
+    .editable-text {
+        -webkit-user-select: text;
+        user-select: text;
+        caret-color: #ff9800;
+        padding: 0 2px;
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <span class="back-btn">‹</span>
+        <span>Results</span>
+        <span style="visibility: hidden;">›</span>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" id="tab-grades">Grades</div>
+        <div class="tab" id="tab-scores">Scores</div>
+        <div class="tab">Scholarships</div>
+    </div>
+
+    <!-- GRADES VIEW -->
+    <div id="view-grades">
+        <div class="year-selector">
+            <button class="year-btn active">2025-2026</button>
+            <button class="year-btn">2024-2025</button>
+            <div class="dropdown-icon" style="margin-left: auto; align-self: center;">▼</div>
+        </div>
+
+        <!-- SEMESTER 1 -->
+        <div class="semester-title">Semester 1</div>
+        <div class="course-list">
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">7</div>
+                <div class="course-name">Rezistența materialelor I</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">8</div>
+                <div class="course-name">Matematici speciale și teoria probabilităților și statistică matematică</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">AD</div>
+                <div class="course-name">Educație fizică și sport III</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">6</div>
+                <div class="course-name">Electronică aplicată</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">7</div>
+                <div class="course-name">Economie generală</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">7</div>
+                <div class="course-name">Mecanică II</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">9</div>
+                <div class="course-name">Limba franceză 3</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+        </div>
+
+        <!-- SEMESTER 2 -->
+        <div class="semester-title">Semester 2</div>
+        <div class="course-list">
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">8</div>
+                <div class="course-name">Mecanisme</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">7</div>
+                <div class="course-name">Mecanica fluidelor și mașini hidraulice</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">7</div>
+                <div class="course-name">Rezistența materialelor II</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">5</div>
+                <div class="course-name">Organe de mașini I</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">AD</div>
+                <div class="course-name">Educație fizică și sport IV</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-card">
+                <div class="grade-badge" contenteditable="true">8</div>
+                <div class="course-name">Toleranțe și control dimensional</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCORES VIEW (Initially hidden) -->
+    <div id="view-scores" style="display: none;">
+        
+        <!-- CARD 1 -->
+        <div class="score-card">
+            <div class="score-title">An universitar 2024-2025 (I)</div>
+            
+            <div class="score-row">
+                <span class="score-icon">★</span>
+                <span>Final score: <span class="editable-text" contenteditable="true">7.05</span></span>
+            </div>
+            <div class="score-row">
+                <span class="score-icon">🎓</span>
+                <span>School situation: <span class="editable-text" contenteditable="true">Promovat (integralist)</span></span>
+            </div>
+            <div class="score-row">
+                <span class="score-icon">≡</span>
+                <span>Specialisation: Autovehicule rutiere- limba engleza</span>
+            </div>
+
+            <div class="score-grid">
+                <div>
+                    <div class="score-grid-title">Semester I</div>
+                    <div class="score-pill" contenteditable="true">8.03</div>
+                    <div class="score-credits">30 credits</div>
+                </div>
+                <div>
+                    <div class="score-grid-title">Semester II</div>
+                    <div class="score-pill" contenteditable="true">6.06</div>
+                    <div class="score-credits">30 credits</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="score-card">
+            <div class="score-title">An universitar 2025-2026 (II)</div>
+            
+            <div class="score-row">
+                <span class="score-icon">≡</span>
+                <span>Specialisation: Autovehicule rutiere- în limba engleză</span>
+            </div>
+
+            <div class="score-grid">
+                <div>
+                    <div class="score-grid-title">Semester I</div>
+                    <div class="score-pill" contenteditable="true">No average</div>
+                    <div class="score-credits">24 credits</div>
+                </div>
+                <div>
+                    <div class="score-grid-title">Semester II</div>
+                    <div class="score-pill" contenteditable="true">No average</div>
+                    <div class="score-credits">12 credits</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Tab Switching Logic
+    const tabGrades = document.getElementById('tab-grades');
+    const tabScores = document.getElementById('tab-scores');
+    const viewGrades = document.getElementById('view-grades');
+    const viewScores = document.getElementById('view-scores');
+
+    tabGrades.addEventListener('click', () => {
+        tabGrades.classList.add('active');
+        tabScores.classList.remove('active');
+        viewGrades.style.display = 'block';
+        viewScores.style.display = 'none';
+    });
+
+    tabScores.addEventListener('click', () => {
+        tabScores.classList.add('active');
+        tabGrades.classList.remove('active');
+        viewScores.style.display = 'block';
+        viewGrades.style.display = 'none';
+    });
+
+    // Blur boxes when hitting enter so the keyboard dismisses natively
+    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                el.blur();
+            }
+        });
+        
+        // Select all text on first tap for quick replacing
+        el.addEventListener('focus', function() {
+            let range = document.createRange();
+            let sel = window.getSelection();
+            range.selectNodeContents(this);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        });
+    });
+</script>
+</body>
+</html>
