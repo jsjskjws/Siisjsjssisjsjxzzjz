@@ -59,7 +59,7 @@
     .header-dots { font-size: 24px; color: #aaa; margin-top: -8px; }
 
     /* DASHBOARD */
-    #dashboard-view { display: block; }
+    #dashboard-view { display: block; min-height: 100%; }
     .dash-header { text-align: center; margin-top: 15px; margin-bottom: 25px; font-size: 18px; font-weight: 500; }
     .hero-card {
         background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
@@ -106,15 +106,9 @@
     .tab { padding-bottom: 12px; flex-grow: 1; text-align: center; cursor: pointer; transition: color 0.3s; }
     .tab.active { color: #ff9800; }
     
-    /* The magic sliding bar */
     .tab-slider {
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        height: 2px;
-        background-color: #ff9800;
-        transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        z-index: 2;
+        position: absolute; bottom: -1px; left: 0; height: 2px;
+        background-color: #ff9800; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); z-index: 2;
     }
     
     /* EMPTY STATES */
@@ -126,7 +120,7 @@
     .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
 
     /* PAGE WRAPPERS */
-    #schedule-wrapper, #fees-wrapper, #results-wrapper { display: none; padding-bottom: 20px;}
+    #schedule-wrapper, #fees-wrapper, #results-wrapper { display: none; padding-bottom: 20px; min-height: 100%;}
 
     /* SCHEDULE */
     .date-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
@@ -225,7 +219,6 @@
         <div class="tabs" id="fees-tabs">
             <div class="tab active">Accommodation</div>
             <div class="tab">Tuition and other</div>
-            <!-- The gliding indicator (50% width since there are 2 tabs) -->
             <div class="tab-slider" id="fees-slider" style="width: 50%; transform: translateX(0%);"></div>
         </div>
 
@@ -289,7 +282,6 @@
             <div class="tab active">Grades</div>
             <div class="tab">Scores</div>
             <div class="tab">Scholarships</div>
-            <!-- The gliding indicator (33.33% width since there are 3 tabs) -->
             <div class="tab-slider" id="results-slider" style="width: 33.33%; transform: translateX(0%);"></div>
         </div>
 
@@ -330,7 +322,6 @@
             </div>
         </div>
 
-        <!-- Placeholder for Scholarships -->
         <div id="view-scholarships" class="empty-state" style="display: none;">
             <div class="empty-text">No active scholarships</div>
         </div>
@@ -346,8 +337,12 @@
 </div>
 
 <script>
-    // PAGE ROUTER
+    // --- GLOBAL STATE ---
+    window.activePage = 'dashboard-view';
+
+    // --- PAGE ROUTER ---
     function openPage(pageId, direction) {
+        window.activePage = pageId;
         const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper'];
         pages.forEach(id => {
             const el = document.getElementById(id);
@@ -362,55 +357,73 @@
         window.scrollTo(0, 0);
     }
 
-    // --- SWIPE GESTURE DETECTOR ---
-    // This allows you to swipe left/right to trigger actions without tapping buttons
-    function attachSwipeListener(wrapperId, onSwipeLeft, onSwipeRight) {
-        const wrapper = document.getElementById(wrapperId);
-        let startX = 0, startY = 0, endX = 0, endY = 0;
+    // --- GLOBAL GESTURE ENGINE (Fixes swipe zone issues and handles native iOS back) ---
+    let startX = 0, startY = 0, endX = 0, endY = 0;
 
-        wrapper.addEventListener('touchstart', e => {
-            startX = e.changedTouches[0].screenX;
-            startY = e.changedTouches[0].screenY;
-        }, {passive: true});
+    document.addEventListener('touchstart', e => {
+        startX = e.changedTouches[0].screenX;
+        startY = e.changedTouches[0].screenY;
+    }, {passive: true});
 
-        wrapper.addEventListener('touchend', e => {
-            endX = e.changedTouches[0].screenX;
-            endY = e.changedTouches[0].screenY;
+    document.addEventListener('touchend', e => {
+        endX = e.changedTouches[0].screenX;
+        endY = e.changedTouches[0].screenY;
+        
+        const diffX = endX - startX;
+        const absX = Math.abs(diffX);
+        const absY = Math.abs(endY - startY);
+        
+        // Ensure the swipe was mostly horizontal and long enough to count
+        if (absX > 50 && absX > absY) {
             
-            // Check if horizontal swipe is much larger than vertical swipe (avoids accidental triggers when scrolling)
-            const diffX = Math.abs(endX - startX);
-            const diffY = Math.abs(endY - startY);
+            // SWIPE RIGHT (Finger moves left -> right)
+            if (diffX > 0) {
+                // 1. Check for iOS Edge Swipe (Starting from very left edge of screen)
+                if (startX < 40) {
+                     if (window.activePage !== 'dashboard-view') openPage('dashboard-view', 'back');
+                     return;
+                }
+                
+                // 2. Normal swiping between inner tabs
+                if (window.activePage === 'fees-wrapper') {
+                    if (feesIndex > 0) setFeesTab(feesIndex - 1);
+                    else openPage('dashboard-view', 'back'); // Fallback: swipe right on first tab goes to dashboard
+                } else if (window.activePage === 'results-wrapper') {
+                    if (resultsIndex > 0) setResultsTab(resultsIndex - 1);
+                    else openPage('dashboard-view', 'back');
+                } else if (window.activePage === 'schedule-wrapper') {
+                    if (scheduleIndex > 0) setScheduleDay(scheduleIndex - 1);
+                    else openPage('dashboard-view', 'back');
+                }
+            } 
             
-            if (diffX > 50 && diffX > diffY) {
-                if (endX < startX) onSwipeLeft();   // Swiped left (go next)
-                if (endX > startX) onSwipeRight(); // Swiped right (go previous)
+            // SWIPE LEFT (Finger moves right -> left)
+            else {
+                if (window.activePage === 'fees-wrapper') setFeesTab(feesIndex + 1);
+                else if (window.activePage === 'results-wrapper') setResultsTab(resultsIndex + 1);
+                else if (window.activePage === 'schedule-wrapper') setScheduleDay(scheduleIndex + 1);
             }
-        }, {passive: true});
-    }
+        }
+    }, {passive: true});
 
-    // --- FEES TAB LOGIC (With Glide) ---
+
+    // --- FEES LOGIC ---
     let feesIndex = 0;
     const feesTabs = document.querySelectorAll('#fees-tabs .tab');
     function setFeesTab(index) {
         if (index < 0 || index > 1) return;
         feesIndex = index;
         
-        // Update active class
         feesTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
-        // Move sliding bar (0% or 100%)
         document.getElementById('fees-slider').style.transform = `translateX(${index * 100}%)`;
         
-        // Switch Views
         document.getElementById('view-accommodation').style.display = index === 0 ? 'flex' : 'none';
         document.getElementById('view-tuition').style.display = index === 1 ? 'flex' : 'none';
     }
-    // Allow tapping on the tabs
     feesTabs.forEach((tab, i) => tab.addEventListener('click', () => setFeesTab(i)));
-    // Allow swiping on the page
-    attachSwipeListener('fees-wrapper', () => setFeesTab(feesIndex + 1), () => setFeesTab(feesIndex - 1));
 
 
-    // --- RESULTS TAB LOGIC (With Glide) ---
+    // --- RESULTS LOGIC ---
     let resultsIndex = 0;
     const resultsTabs = document.querySelectorAll('#results-tabs .tab');
     function setResultsTab(index) {
@@ -425,11 +438,10 @@
         document.getElementById('view-scholarships').style.display = index === 2 ? 'flex' : 'none';
     }
     resultsTabs.forEach((tab, i) => tab.addEventListener('click', () => setResultsTab(i)));
-    attachSwipeListener('results-wrapper', () => setResultsTab(resultsIndex + 1), () => setResultsTab(resultsIndex - 1));
 
 
-    // --- SCHEDULE LOGIC (Swipe to change days) ---
-    let scheduleIndex = 3; // Starts on Thursday (index 3)
+    // --- SCHEDULE LOGIC ---
+    let scheduleIndex = 3; // Starts on Thursday
     const scheduleDays = document.querySelectorAll('.day-card');
     function setScheduleDay(index) {
         if (index < 0 || index > 4) return;
@@ -437,10 +449,9 @@
         scheduleDays.forEach((card, i) => card.classList.toggle('active', i === index));
     }
     scheduleDays.forEach((card, i) => card.addEventListener('click', () => setScheduleDay(i)));
-    attachSwipeListener('schedule-wrapper', () => setScheduleDay(scheduleIndex + 1), () => setScheduleDay(scheduleIndex - 1));
 
 
-    // Fix editable text behavior
+    // --- FIX EDITABLE TEXT ---
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
         el.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
