@@ -17,6 +17,7 @@
         justify-content: center;
         -webkit-user-select: none;
         user-select: none;
+        overflow-x: hidden; /* Prevents horizontal scroll during animations */
     }
     .app-container {
         width: 100%;
@@ -26,8 +27,26 @@
         padding: env(safe-area-inset-top) 20px 80px 20px;
         box-sizing: border-box;
         position: relative;
+        overflow-x: hidden;
     }
     
+    /* ANIMATIONS */
+    .slide-in-right {
+        animation: slideInRight 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .slide-in-left {
+        animation: slideInLeft 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes slideInRight {
+        0% { transform: translateX(100%); opacity: 0.5; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInLeft {
+        0% { transform: translateX(-30%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+
     /* SHARED STYLES */
     .icon-wrapper {
         background-color: #1a1a1a;
@@ -162,7 +181,7 @@
 <div class="app-container">
 
     <!-- ================= DASHBOARD VIEW ================= -->
-    <div id="dashboard-view">
+    <div id="dashboard-view" class="page-view">
         <div class="dash-header">Dashboard</div>
 
         <div class="hero-card">
@@ -178,18 +197,17 @@
         </div>
 
         <div class="grid-container">
-            <div onclick="openPage('schedule-wrapper')" class="grid-item">
+            <div onclick="openPage('schedule-wrapper', 'forward')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg></div>
                 <div class="item-label">SCHEDULE</div>
             </div>
             
-            <!-- FEES BUTTON (Routes to fees-wrapper) -->
-            <div onclick="openPage('fees-wrapper')" class="grid-item">
+            <div onclick="openPage('fees-wrapper', 'forward')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
                 <div class="item-label">FEES</div>
             </div>
 
-            <div onclick="openPage('results-wrapper')" class="grid-item">
+            <div onclick="openPage('results-wrapper', 'forward')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zM2 16h8v-2H2v2zm19.5-4.5L23 13l-6.99 7-4.51-4.5L13 14l3.01 3 5.49-5.5z"/></svg></div>
                 <div class="item-label">RESULTS</div>
             </div>
@@ -208,20 +226,18 @@
 
 
     <!-- ================= FEES VIEW ================= -->
-    <div id="fees-wrapper">
+    <div id="fees-wrapper" class="page-view">
         <div class="page-header">
-            <span class="back-btn" onclick="openPage('dashboard-view')">‹</span>
+            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
             <span>My fees</span>
             <span style="visibility: hidden; padding: 0 10px;">›</span>
         </div>
 
-        <!-- Fees Inner Tabs -->
         <div class="tabs">
             <div class="tab active" id="tab-accommodation">Accommodation</div>
             <div class="tab" id="tab-tuition">Tuition and other</div>
         </div>
 
-        <!-- Accommodation Empty State -->
         <div id="view-accommodation" class="empty-state">
             <svg style="width: 100px; height: 100px; fill: #d4d4d4; margin-bottom: 20px;" viewBox="0 0 24 24">
                 <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/>
@@ -229,7 +245,6 @@
             <div class="empty-text">No accommodation fees</div>
         </div>
 
-        <!-- Tuition Empty State -->
         <div id="view-tuition" class="empty-state" style="display: none;">
             <svg style="width: 100px; height: 100px; fill: #d4d4d4; margin-bottom: 20px;" viewBox="0 0 24 24">
                 <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"/>
@@ -240,9 +255,9 @@
 
 
     <!-- ================= SCHEDULE VIEW ================= -->
-    <div id="schedule-wrapper">
+    <div id="schedule-wrapper" class="page-view">
         <div class="page-header">
-            <span class="back-btn" onclick="openPage('dashboard-view')">‹</span>
+            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
             <span>Schedule</span>
             <span class="header-dots">···</span>
         </div>
@@ -287,9 +302,9 @@
 
 
     <!-- ================= RESULTS VIEW ================= -->
-    <div id="results-wrapper">
+    <div id="results-wrapper" class="page-view">
         <div class="page-header">
-            <span class="back-btn" onclick="openPage('dashboard-view')">‹</span>
+            <span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span>
             <span>Results</span>
             <span style="visibility: hidden;">›</span>
         </div>
@@ -355,7 +370,7 @@
     <!-- Persistent Bottom Navigation -->
     <div class="bottom-nav">
         <!-- Tapping home returns to dashboard -->
-        <svg onclick="openPage('dashboard-view')" class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <svg onclick="openPage('dashboard-view', 'back')" class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         <div class="center-fab"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
         <div style="width: 24px;"></div>
     </div>
@@ -363,16 +378,29 @@
 </div>
 
 <script>
-    // UNIVERSAL ROUTER
-    function openPage(pageId) {
-        // Hide all views
-        document.getElementById('dashboard-view').style.display = 'none';
-        document.getElementById('results-wrapper').style.display = 'none';
-        document.getElementById('schedule-wrapper').style.display = 'none';
-        document.getElementById('fees-wrapper').style.display = 'none';
+    // UNIVERSAL ROUTER WITH ANIMATION SUPPORT
+    function openPage(pageId, direction) {
+        // List of all main page containers
+        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper'];
+        
+        // Hide all views and remove animation classes
+        pages.forEach(id => {
+            const el = document.getElementById(id);
+            el.style.display = 'none';
+            el.classList.remove('slide-in-right', 'slide-in-left');
+        });
         
         // Show the target view
-        document.getElementById(pageId).style.display = 'block';
+        const target = document.getElementById(pageId);
+        target.style.display = 'block';
+        
+        // Apply the correct sliding animation
+        if (direction === 'forward') {
+            target.classList.add('slide-in-right');
+        } else if (direction === 'back') {
+            target.classList.add('slide-in-left');
+        }
+        
         window.scrollTo(0, 0);
     }
 
@@ -384,7 +412,7 @@
 
     tabAccommodation.addEventListener('click', () => {
         tabAccommodation.classList.add('active'); tabTuition.classList.remove('active');
-        viewAccommodation.style.display = 'flex'; viewTuition.style.display = 'none'; // 'flex' used because .empty-state needs it to center
+        viewAccommodation.style.display = 'flex'; viewTuition.style.display = 'none'; 
     });
 
     tabTuition.addEventListener('click', () => {
