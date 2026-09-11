@@ -20,6 +20,20 @@
         user-select: none;
         overflow-x: hidden;
     }
+    
+    /* GLOBAL EDITABLE OVERRIDE FIX */
+    [contenteditable="true"] {
+        -webkit-user-select: text !important;
+        user-select: text !important;
+        cursor: text;
+        outline: none;
+    }
+    [contenteditable="true"]:focus {
+        border-color: #ff9800;
+        background-color: rgba(255, 152, 0, 0.1);
+        border-radius: 4px;
+    }
+
     .app-container {
         width: 100%;
         max-width: 400px;
@@ -63,7 +77,7 @@
         display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
     }
     .icon-wrapper svg { width: 20px; height: 20px; fill: #fff; }
-    .dropdown-icon { color: #aaa; font-size: 14px; }
+    .dropdown-icon { color: #aaa; font-size: 14px; transition: transform 0.3s, color 0.3s; display: inline-block; }
     
     .page-header { 
         display: grid; 
@@ -71,12 +85,8 @@
         align-items: center; 
         margin-top: 15px; margin-bottom: 25px; font-size: 20px; font-weight: 500; 
     }
-    .back-btn { 
-        font-size: 26px; color: #fff; cursor: pointer; padding: 0 10px; margin-left: -10px; 
-    }
-    .header-dots { 
-        font-size: 24px; color: #aaa; margin-top: -4px; 
-    }
+    .back-btn { font-size: 26px; color: #fff; cursor: pointer; padding: 0 10px; margin-left: -10px; }
+    .header-dots { font-size: 24px; color: #aaa; margin-top: -4px; }
 
     /* DASHBOARD */
     #dashboard-view { display: block; min-height: 100%; }
@@ -133,18 +143,11 @@
         transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); z-index: 2;
     }
     .tab-slider::after {
-        content: '';
-        width: 35px;
-        height: 100%;
-        background-color: #ff9800;
-        border-radius: 2px;
+        content: ''; width: 35px; height: 100%; background-color: #ff9800; border-radius: 2px;
     }
     
     /* EMPTY STATES */
-    .empty-state {
-        display: flex; flex-direction: column; align-items: center;
-        justify-content: center; margin-top: 100px;
-    }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 100px; }
     .empty-icon { width: 120px; height: 90px; fill: #d4d4d4; margin-bottom: 25px; }
     .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
 
@@ -165,37 +168,40 @@
     .day-name { font-size: 11px; color: #aaa; }
     .day-card.active .day-name { color: #fff; }
 
-    /* RESULTS */
+    /* RESULTS & COURSE ACCORDIONS */
     .year-selector { display: flex; gap: 12px; margin-bottom: 20px; }
     .year-btn { background-color: #111; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; }
     .year-btn.active { background-color: #ffb74d; color: #000; }
     .semester-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; margin-top: 25px; }
-    .course-card, .score-card { background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-    .course-card { display: flex; align-items: center; }
+    
+    .course-card { background-color: #242424; border-radius: 12px; margin-bottom: 12px; display: flex; flex-direction: column; overflow: hidden; }
+    .course-header { display: flex; align-items: center; padding: 16px; cursor: pointer; }
     .grade-badge {
         background-color: #1a1a1a; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; 
-        border-radius: 10px; font-weight: 600; margin-right: 15px; font-size: 16px; border: 1px solid #333;
-        -webkit-user-select: text; user-select: text; caret-color: #ff9800; flex-shrink: 0;
+        border-radius: 10px; font-weight: 600; margin-right: 15px; font-size: 16px; border: 1px solid #333; flex-shrink: 0;
     }
-    .grade-badge:focus, .editable-text:focus { outline: none; border-color: #ff9800; background-color: #333; }
     .course-name { flex-grow: 1; font-size: 16px; line-height: 1.4; padding-right: 10px; }
+    
+    /* Accordion Details */
+    .course-details { display: none; padding: 0 16px 20px 16px; font-size: 14px; color: #ccc; }
+    .course-card.expanded .course-details { display: block; }
+    .course-card.expanded .dropdown-icon { transform: rotate(180deg); color: #ff9800; }
+    .detail-row { display: flex; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-icon { width: 16px; height: 16px; fill: #aaa; flex-shrink: 0; margin-top: 2px; }
+    .editable-text { padding: 0 2px; border-radius: 4px; display: inline-block; min-width: 10px; }
+
+    /* Scores View */
+    .score-card { background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
     .score-title { text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 20px; }
     .score-row { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 15px; color: #eee; }
     .score-icon { margin-right: 10px; font-size: 18px; color: #ddd; width: 20px; text-align: center; }
     .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; margin-top: 20px; }
     .score-grid-title { font-size: 15px; margin-bottom: 8px; color: #eee; }
-    .score-pill {
-        background-color: #161616; border-radius: 10px; padding: 10px; font-weight: 500; margin-bottom: 8px; 
-        border: 1px solid #2a2a2a; -webkit-user-select: text; user-select: text; caret-color: #ff9800;
-    }
-    .score-credits { font-size: 13px; color: #aaa; }
-    .editable-text { -webkit-user-select: text; user-select: text; caret-color: #ff9800; padding: 0 2px; border-radius: 4px; }
+    .score-pill { background-color: #161616; border-radius: 10px; padding: 10px; font-weight: 500; margin-bottom: 8px; border: 1px solid #2a2a2a; }
 
     /* ANNOUNCEMENTS */
-    .announcement-card {
-        background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 14px; line-height: 1.5;
-        color: #d4d4d4; -webkit-user-select: text; user-select: text;
-    }
+    .announcement-card { background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 14px; line-height: 1.5; color: #d4d4d4; }
     .announcement-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 12px; }
     .announcement-link { color: #d67a28; text-decoration: underline; word-break: break-all; }
     .announcement-footer { display: flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 13px; color: #aaa; }
@@ -207,20 +213,18 @@
     .dc-logo-bars { display: flex; gap: 3px; }
     .dc-logo-bars div { width: 3px; height: 16px; background-color: #fff; }
     .dc-logo-line { width: 22px; height: 1.5px; background-color: #fff; margin-bottom: 3px; }
-    
     .dc-profile { display: flex; align-items: center; gap: 20px; margin-bottom: 35px; padding: 0 10px; }
     .dc-avatar { width: 90px; height: 90px; border-radius: 50%; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .dc-avatar svg { width: 45px; height: 45px; fill: none; stroke: #121212; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-    .dc-name { font-size: 19px; font-weight: 600; margin-bottom: 5px; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
-    .dc-email { font-size: 14px; color: #aaa; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
-    
+    .dc-name { font-size: 19px; font-weight: 600; margin-bottom: 5px; }
+    .dc-email { font-size: 14px; color: #aaa; }
     .dc-info-card { background-color: #201f23; border-radius: 16px; padding: 25px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-    .dc-faculty { font-size: 16px; font-weight: 600; margin-bottom: 15px; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
-    .dc-specialization { font-size: 16px; font-weight: 600; color: #ddd; line-height: 1.5; margin-bottom: 20px; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
+    .dc-faculty { font-size: 16px; font-weight: 600; margin-bottom: 15px; }
+    .dc-specialization { font-size: 16px; font-weight: 600; color: #ddd; line-height: 1.5; margin-bottom: 20px; }
     .dc-divider { height: 1px; background-color: #3b3b3b; margin-bottom: 20px; }
     .dc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .dc-label { font-size: 13px; color: #aaa; margin-bottom: 8px; }
-    .dc-val { font-size: 16px; font-weight: 600; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
+    .dc-val { font-size: 16px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -275,34 +279,16 @@
             <div style="text-align: center; font-size: 18px;">Secretariat Announcements</div>
             <div style="text-align: right;"></div>
         </div>
-
+        <!-- Same as before -->
         <div class="announcement-card">
             <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
             <div>
                 Vă anunțăm ca s-a afișat Programarea restanțelor și reexaminărilor TOAMNĂ 2026 pe site-ul facultății la secțiunea Programarea examenelor.<br>
-                <a class="announcement-link">mecanica.unitbv.ro/images/studenti/examene/2026.09/Sesiune_restante_si_reexaminari_toamna_2026.pdf</a><br>
-                <a class="announcement-link">mecanica.unitbv.ro/ro/studenti/programarea-examenelor.html</a>
-                Vă rugăm sa verificați frecvent pe site deoarece există posibilitatea ca până în septembrie să se mai modifice unele date de examene, ore, sali. Pentru fiecare cadru didactic există 2 date de examen. Vă rugăm sa țineți cont de această planificare și nu de cea de pe intranet unde se trece doar o singură dată de examen în vederea generării catalogului de note.<br>
-                Secretar șef Ing. Andreea Nuț
+                <a class="announcement-link">mecanica.unitbv.ro/images/studenti/examene/2026.09/Sesiune_restante_si_reexaminari_toamna_2026.pdf</a>
             </div>
             <div class="announcement-footer">
                 <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                 <span>Publish date: 09.07.2026 11:45</span>
-            </div>
-        </div>
-
-        <div class="announcement-card">
-            <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
-            <div>
-                Vă anunțăm ca s-a afișat Programarea restanțelor și reexaminărilor TOAMNĂ 2026 pe site-ul facultății la secțiunea Programarea examenelor.<br>
-                <a class="announcement-link">mecanica.unitbv.ro/images/studenti/examene/2026.09/Sesiune_restante_si_reexaminari_toamna_2026.pdf</a><br>
-                <a class="announcement-link">mecanica.unitbv.ro/ro/studenti/programarea-examenelor.html</a>
-                Vă rugăm sa verificați frecvent pe site deoarece există posibilitatea ca până în septembrie să se mai modifice unele date de examene, ore, sali. Pentru fiecare cadru didactic există 2 date de examen. Vă rugăm sa țineți cont de această planificare și nu de cea de pe intranet unde se trece doar o singură dată de examen în vederea generării catalogului de note.<br>
-                Secretar șef Ing. Andreea Nuț
-            </div>
-            <div class="announcement-footer">
-                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                <span>Publish date: 09.07.2026 11:43</span>
             </div>
         </div>
     </div>
@@ -389,35 +375,29 @@
             <div class="year-selector">
                 <button class="year-btn active">2025-2026</button>
                 <button class="year-btn">2024-2025</button>
-                <div class="dropdown-icon" style="margin-left: auto; align-self: center;">▼</div>
             </div>
 
+            <!-- SEMESTER 1 -->
             <div class="semester-title">Semester 1</div>
-            <div class="course-list">
-                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Rezistența materialelor I</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">8</div><div class="course-name">Matematici speciale și teoria probabilităților...</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">AD</div><div class="course-name">Educație fizică și sport III</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">6</div><div class="course-name">Electronică aplicată</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Economie generală</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Mecanică II</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">9</div><div class="course-name">Limba franceză 3</div><div class="dropdown-icon">▼</div></div>
+            <div class="course-list" id="semester-1-list">
+                <!-- Javascript will render these, but adding one here for structure clarity -->
             </div>
             
+            <!-- SEMESTER 2 -->
             <div class="semester-title">Semester 2</div>
-            <div class="course-list">
-                <div class="course-card"><div class="grade-badge" contenteditable="true">8</div><div class="course-name">Mecanisme</div><div class="dropdown-icon">▼</div></div>
-                <div class="course-card"><div class="grade-badge" contenteditable="true">7</div><div class="course-name">Mecanica fluidelor și mașini hidraulice</div><div class="dropdown-icon">▼</div></div>
+            <div class="course-list" id="semester-2-list">
+                <!-- Javascript will render these -->
             </div>
         </div>
 
         <div id="view-scores" style="display: none;">
             <div class="score-card">
                 <div class="score-title">An universitar 2024-2025 (I)</div>
-                <div class="score-row"><span class="score-icon">★</span><span>Final score: <span class="editable-text" contenteditable="true">7.05</span></span></div>
-                <div class="score-row"><span class="score-icon">🎓</span><span>School situation: <span class="editable-text" contenteditable="true">Promovat</span></span></div>
+                <div class="score-row"><span class="score-icon">★</span><span>Final score: <span class="editable-text" contenteditable="true" onclick="event.stopPropagation()">7.05</span></span></div>
+                <div class="score-row"><span class="score-icon">🎓</span><span>School situation: <span class="editable-text" contenteditable="true" onclick="event.stopPropagation()">Promovat</span></span></div>
                 <div class="score-grid">
-                    <div><div class="score-grid-title">Semester I</div><div class="score-pill" contenteditable="true">8.03</div></div>
-                    <div><div class="score-grid-title">Semester II</div><div class="score-pill" contenteditable="true">6.06</div></div>
+                    <div><div class="score-grid-title">Semester I</div><div class="score-pill" contenteditable="true" onclick="event.stopPropagation()">8.03</div></div>
+                    <div><div class="score-grid-title">Semester II</div><div class="score-pill" contenteditable="true" onclick="event.stopPropagation()">6.06</div></div>
                 </div>
             </div>
         </div>
@@ -439,19 +419,14 @@
         <div class="dc-univ-header">
             <div class="dc-logo-box">
                 <div class="dc-logo-line"></div>
-                <div class="dc-logo-bars">
-                    <div></div><div></div><div></div><div></div>
-                </div>
+                <div class="dc-logo-bars"><div></div><div></div><div></div><div></div></div>
             </div>
             <span>Transilvania University of Brasov</span>
         </div>
 
         <div class="dc-profile">
             <div class="dc-avatar">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="8" r="4"></circle>
-                    <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8"></path>
-                </svg>
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8"></path></svg>
             </div>
             <div class="dc-user-info">
                 <div class="dc-name" contenteditable="true">Antonio-Adrian Staicu</div>
@@ -508,9 +483,8 @@
         window.scrollTo(0, 0);
     }
 
-    // --- GLOBAL GESTURE ENGINE (Fixes swipe zone issues and handles native iOS back) ---
+    // --- GLOBAL GESTURE ENGINE ---
     let startX = 0, startY = 0, endX = 0, endY = 0;
-
     document.addEventListener('touchstart', e => {
         startX = e.changedTouches[0].screenX;
         startY = e.changedTouches[0].screenY;
@@ -519,23 +493,16 @@
     document.addEventListener('touchend', e => {
         endX = e.changedTouches[0].screenX;
         endY = e.changedTouches[0].screenY;
-        
         const diffX = endX - startX;
         const absX = Math.abs(diffX);
         const absY = Math.abs(endY - startY);
         
-        // Ensure the swipe was mostly horizontal and long enough to count
         if (absX > 50 && absX > absY) {
-            
-            // SWIPE RIGHT (Finger moves left -> right)
-            if (diffX > 0) {
-                // 1. Check for iOS Edge Swipe (Starting from very left edge of screen)
+            if (diffX > 0) { // Swipe Right
                 if (startX < 40) {
                      if (window.activePage !== 'dashboard-view') openPage('dashboard-view', 'back');
                      return;
                 }
-                
-                // 2. Normal swiping between inner tabs
                 if (window.activePage === 'fees-wrapper') {
                     if (feesIndex > 0) setFeesTab(feesIndex - 1);
                     else openPage('dashboard-view', 'back');
@@ -548,10 +515,7 @@
                 } else if (window.activePage === 'digital-card-wrapper') {
                     openPage('dashboard-view', 'back');
                 }
-            } 
-            
-            // SWIPE LEFT (Finger moves right -> left)
-            else {
+            } else { // Swipe Left
                 if (window.activePage === 'fees-wrapper') setFeesTab(feesIndex + 1);
                 else if (window.activePage === 'results-wrapper') setResultsTab(resultsIndex + 1);
                 else if (window.activePage === 'schedule-wrapper') setScheduleDay(scheduleIndex + 1);
@@ -559,87 +523,123 @@
         }
     }, {passive: true});
 
-
-    // --- FEES LOGIC ---
+    // --- TABS LOGIC ---
     let feesIndex = 0;
     const feesTabs = document.querySelectorAll('#fees-tabs .tab');
     function setFeesTab(index) {
         if (index < 0 || index > 1) return;
         const oldIndex = feesIndex;
         feesIndex = index;
-        
         feesTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
         document.getElementById('fees-slider').style.transform = `translateX(${index * 100}%)`;
-        
         const views = ['view-accommodation', 'view-tuition'];
         views.forEach((id, i) => {
             const el = document.getElementById(id);
             if (i === index) {
                 el.style.display = 'flex';
                 el.classList.remove('tab-slide-forward', 'tab-slide-backward');
-                // Trigger reflow to restart animation
                 void el.offsetWidth;
                 el.classList.add(index > oldIndex ? 'tab-slide-forward' : 'tab-slide-backward');
-            } else {
-                el.style.display = 'none';
-            }
+            } else el.style.display = 'none';
         });
     }
     feesTabs.forEach((tab, i) => tab.addEventListener('click', () => setFeesTab(i)));
 
-
-    // --- RESULTS LOGIC ---
     let resultsIndex = 0;
     const resultsTabs = document.querySelectorAll('#results-tabs .tab');
     function setResultsTab(index) {
         if (index < 0 || index > 2) return;
         const oldIndex = resultsIndex;
         resultsIndex = index;
-        
         resultsTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
         document.getElementById('results-slider').style.transform = `translateX(${index * 100}%)`;
-        
         const views = ['view-grades', 'view-scores', 'view-scholarships'];
         views.forEach((id, i) => {
             const el = document.getElementById(id);
             if (i === index) {
                 el.style.display = id === 'view-scholarships' ? 'flex' : 'block';
                 el.classList.remove('tab-slide-forward', 'tab-slide-backward');
-                // Trigger reflow to restart animation
                 void el.offsetWidth;
                 el.classList.add(index > oldIndex ? 'tab-slide-forward' : 'tab-slide-backward');
-            } else {
-                el.style.display = 'none';
-            }
+            } else el.style.display = 'none';
         });
     }
     resultsTabs.forEach((tab, i) => tab.addEventListener('click', () => setResultsTab(i)));
 
-
-    // --- SCHEDULE LOGIC ---
-    let scheduleIndex = 3; // Starts on Thursday
-    const scheduleDays = document.querySelectorAll('.day-card');
-    function setScheduleDay(index) {
-        if (index < 0 || index > 4) return;
-        scheduleIndex = index;
-        scheduleDays.forEach((card, i) => card.classList.toggle('active', i === index));
+    // --- ACCORDION LISTS RENDERER ---
+    function toggleCourse(el) {
+        el.classList.toggle('expanded');
     }
-    scheduleDays.forEach((card, i) => card.addEventListener('click', () => setScheduleDay(i)));
 
+    const icons = {
+        mark: `<svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"/></svg>`,
+        date: `<svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>`,
+        credits: `<svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>`,
+        spec: `<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>`
+    };
 
-    // --- FIX EDITABLE TEXT ---
-    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-        el.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    function renderCourse(course, expanded = false) {
+        return `
+        <div class="course-card ${expanded ? 'expanded' : ''}">
+            <div class="course-header" onclick="toggleCourse(this.parentElement)">
+                <div class="grade-badge" contenteditable="true" onclick="event.stopPropagation()">${course.grade}</div>
+                <div class="course-name">${course.name}</div>
+                <div class="dropdown-icon">▼</div>
+            </div>
+            <div class="course-details">
+                <div class="detail-row">
+                    <div class="detail-icon">${icons.mark}</div>
+                    <span>Mark: <span class="editable-text" contenteditable="true" onclick="event.stopPropagation()">${course.markDesc}</span></span>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-icon">${icons.date}</div>
+                    <span>Date: <span class="editable-text" contenteditable="true" onclick="event.stopPropagation()">${course.date}</span></span>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-icon">${icons.credits}</div>
+                    <span>Credits number: <span class="editable-text" contenteditable="true" onclick="event.stopPropagation()">${course.credits}</span></span>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-icon">${icons.spec}</div>
+                    <span>Specialisation: Autovehicule rutiere- în limba engleză</span>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    const sem1 = [
+        { grade: "7", name: "Rezistența materialelor I", markDesc: "7 (Șapte)", date: "02.02.2026", credits: "5" },
+        { grade: "8", name: "Matematici speciale și teoria prob...", markDesc: "8 (Opt)", date: "29.01.2026", credits: "4" }
+    ];
+
+    const sem2 = [
+        { grade: "AB", name: "Practica de domeniu", markDesc: "Absent", date: "10.09.2026", credits: "4", expanded: true },
+        { grade: "AB", name: "Mecanisme", markDesc: "Absent", date: "10.09.2026", credits: "5" },
+        { grade: "AB", name: "Mecanica fluidelor și mașini hidraulice", markDesc: "Absent", date: "10.09.2026", credits: "5" },
+        { grade: "AB", name: "Rezistența materialelor II", markDesc: "Absent", date: "10.09.2026", credits: "4" },
+        { grade: "5", name: "Organe de mașini I", markDesc: "5 (Cinci)", date: "03.09.2026", credits: "5" },
+        { grade: "AD", name: "Educație fizică și sport IV", markDesc: "Admis", date: "02.06.2026", credits: "1" }
+    ];
+
+    document.getElementById('semester-1-list').innerHTML = sem1.map(c => renderCourse(c)).join('');
+    document.getElementById('semester-2-list').innerHTML = sem2.map(c => renderCourse(c, c.expanded)).join('');
+
+    // --- FIX EDITABLE TEXT GLOBALLY ---
+    function attachEditableListeners() {
+        document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+            });
+            el.addEventListener('focus', function() {
+                let range = document.createRange();
+                let sel = window.getSelection();
+                range.selectNodeContents(this);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            });
         });
-        el.addEventListener('focus', function() {
-            let range = document.createRange();
-            let sel = window.getSelection();
-            range.selectNodeContents(this);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        });
-    });
+    }
+    attachEditableListeners(); // Initial attach
 </script>
 </body>
 </html>
