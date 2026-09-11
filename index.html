@@ -152,7 +152,7 @@
     .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
 
     /* PAGE WRAPPERS */
-    #schedule-wrapper, #fees-wrapper, #results-wrapper, #announcements-wrapper, #digital-card-wrapper { display: none; padding-bottom: 20px; min-height: 100%;}
+    #schedule-wrapper, #fees-wrapper, #results-wrapper, #exams-wrapper, #announcements-wrapper, #digital-card-wrapper { display: none; padding-bottom: 20px; min-height: 100%;}
 
     /* SCHEDULE */
     .date-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
@@ -260,7 +260,7 @@
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zM2 16h8v-2H2v2zm19.5-4.5L23 13l-6.99 7-4.51-4.5L13 14l3.01 3 5.49-5.5z"/></svg></div>
                 <div class="item-label">RESULTS</div>
             </div>
-            <div class="grid-item">
+            <div onclick="openPage('exams-wrapper', 'forward')" class="grid-item">
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
                 <div class="item-label">EXAMS</div>
             </div>
@@ -268,6 +268,44 @@
                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-9 11h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg></div>
                 <div class="item-label">ANNOUNCEMENTS</div>
             </div>
+        </div>
+    </div>
+
+
+    <!-- ================= EXAMS VIEW ================= -->
+    <div id="exams-wrapper" class="page-view">
+        <div class="page-header">
+            <div style="text-align: left;"><span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span></div>
+            <div style="text-align: center;">Exam scheduling</div>
+            <div style="text-align: right;"><span style="font-size: 20px; font-weight: 600; color: #fff; background: #2a2a2a; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;">?</span></div>
+        </div>
+
+        <div class="tabs" id="exams-tabs">
+            <div class="tab active">Session</div>
+            <div class="tab">Reexaminations</div>
+            <div class="tab">Other</div>
+            <div class="tab-slider" id="exams-slider" style="width: 33.33%; transform: translateX(0%);"></div>
+        </div>
+
+        <div id="view-exam-session" class="empty-state">
+            <svg style="width: 80px; height: 100px; fill: #a0a0a0; margin-bottom: 25px;" viewBox="0 0 384 512">
+                <path d="M320 464H64V48h192v96h96v320zm0-352H240V0H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V160l-112-112zM112 240h160v32H112zm0 80h160v32H112z"/>
+            </svg>
+            <div class="empty-text">No exams scheduled yet</div>
+        </div>
+
+        <div id="view-exam-reex" class="empty-state" style="display: none;">
+            <svg style="width: 80px; height: 100px; fill: #a0a0a0; margin-bottom: 25px;" viewBox="0 0 384 512">
+                <path d="M320 464H64V48h192v96h96v320zm0-352H240V0H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V160l-112-112zM112 240h160v32H112zm0 80h160v32H112z"/>
+            </svg>
+            <div class="empty-text">No exams scheduled yet</div>
+        </div>
+
+        <div id="view-exam-other" class="empty-state" style="display: none;">
+            <svg style="width: 80px; height: 100px; fill: #a0a0a0; margin-bottom: 25px;" viewBox="0 0 384 512">
+                <path d="M320 464H64V48h192v96h96v320zm0-352H240V0H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V160l-112-112zM112 240h160v32H112zm0 80h160v32H112z"/>
+            </svg>
+            <div class="empty-text">No exams scheduled yet</div>
         </div>
     </div>
 
@@ -465,7 +503,7 @@
     // --- PAGE ROUTER ---
     function openPage(pageId, direction) {
         window.activePage = pageId;
-        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper', 'announcements-wrapper', 'digital-card-wrapper'];
+        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper', 'exams-wrapper', 'announcements-wrapper', 'digital-card-wrapper'];
         pages.forEach(id => {
             const el = document.getElementById(id);
             el.style.display = 'none';
@@ -505,6 +543,9 @@
                 } else if (window.activePage === 'results-wrapper') {
                     if (resultsIndex > 0) setResultsTab(resultsIndex - 1);
                     else openPage('dashboard-view', 'back');
+                } else if (window.activePage === 'exams-wrapper') {
+                    if (examsIndex > 0) setExamsTab(examsIndex - 1);
+                    else openPage('dashboard-view', 'back');
                 } else if (window.activePage === 'schedule-wrapper') {
                     if (scheduleIndex > 0) setScheduleDay(scheduleIndex - 1);
                     else openPage('dashboard-view', 'back');
@@ -514,6 +555,7 @@
             } else { // Swipe Left
                 if (window.activePage === 'fees-wrapper') setFeesTab(feesIndex + 1);
                 else if (window.activePage === 'results-wrapper') setResultsTab(resultsIndex + 1);
+                else if (window.activePage === 'exams-wrapper') setExamsTab(examsIndex + 1);
                 else if (window.activePage === 'schedule-wrapper') setScheduleDay(scheduleIndex + 1);
             }
         }
@@ -561,6 +603,27 @@
         });
     }
     resultsTabs.forEach((tab, i) => tab.addEventListener('click', () => setResultsTab(i)));
+
+    let examsIndex = 0;
+    const examsTabs = document.querySelectorAll('#exams-tabs .tab');
+    function setExamsTab(index) {
+        if (index < 0 || index > 2) return;
+        const oldIndex = examsIndex;
+        examsIndex = index;
+        examsTabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+        document.getElementById('exams-slider').style.transform = `translateX(${index * 100}%)`;
+        const views = ['view-exam-session', 'view-exam-reex', 'view-exam-other'];
+        views.forEach((id, i) => {
+            const el = document.getElementById(id);
+            if (i === index) {
+                el.style.display = 'flex';
+                el.classList.remove('tab-slide-forward', 'tab-slide-backward');
+                void el.offsetWidth;
+                el.classList.add(index > oldIndex ? 'tab-slide-forward' : 'tab-slide-backward');
+            } else el.style.display = 'none';
+        });
+    }
+    examsTabs.forEach((tab, i) => tab.addEventListener('click', () => setExamsTab(i)));
 
     // --- ACCORDION LISTS RENDERER ---
     function toggleCourse(el) {
