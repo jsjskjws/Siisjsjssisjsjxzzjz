@@ -115,6 +115,7 @@
         position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
         background-color: #ff9800; width: 55px; height: 55px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        cursor: pointer;
     }
     .center-fab svg { width: 24px; height: 24px; fill: #000; }
 
@@ -148,7 +149,7 @@
     .empty-text { font-size: 15px; color: #d4d4d4; font-weight: 400; }
 
     /* PAGE WRAPPERS */
-    #schedule-wrapper, #fees-wrapper, #results-wrapper, #announcements-wrapper { display: none; padding-bottom: 20px; min-height: 100%;}
+    #schedule-wrapper, #fees-wrapper, #results-wrapper, #announcements-wrapper, #digital-card-wrapper { display: none; padding-bottom: 20px; min-height: 100%;}
 
     /* SCHEDULE */
     .date-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
@@ -192,40 +193,34 @@
 
     /* ANNOUNCEMENTS */
     .announcement-card {
-        background-color: #242424;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 16px;
-        font-size: 14px;
-        line-height: 1.5;
-        color: #d4d4d4;
-        -webkit-user-select: text;
-        user-select: text;
+        background-color: #242424; border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 14px; line-height: 1.5;
+        color: #d4d4d4; -webkit-user-select: text; user-select: text;
     }
-    .announcement-title {
-        font-size: 15px;
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 12px;
-    }
-    .announcement-link {
-        color: #d67a28; /* Matching the orange/brown link color */
-        text-decoration: underline;
-        word-break: break-all;
-    }
-    .announcement-footer {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 18px;
-        font-size: 13px;
-        color: #aaa;
-    }
-    .announcement-footer svg {
-        width: 16px;
-        height: 16px;
-        fill: #aaa;
-    }
+    .announcement-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 12px; }
+    .announcement-link { color: #d67a28; text-decoration: underline; word-break: break-all; }
+    .announcement-footer { display: flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 13px; color: #aaa; }
+    .announcement-footer svg { width: 16px; height: 16px; fill: #aaa; }
+
+    /* DIGITAL CARD */
+    .dc-univ-header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 30px; font-size: 16px; font-weight: 500; }
+    .dc-logo-box { width: 32px; height: 28px; border: 1.5px solid #fff; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2px; box-sizing: border-box; }
+    .dc-logo-bars { display: flex; gap: 3px; }
+    .dc-logo-bars div { width: 3px; height: 16px; background-color: #fff; }
+    .dc-logo-line { width: 22px; height: 1.5px; background-color: #fff; margin-bottom: 3px; }
+    
+    .dc-profile { display: flex; align-items: center; gap: 20px; margin-bottom: 35px; padding: 0 10px; }
+    .dc-avatar { width: 90px; height: 90px; border-radius: 50%; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .dc-avatar svg { width: 45px; height: 45px; fill: none; stroke: #121212; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .dc-name { font-size: 19px; font-weight: 600; margin-bottom: 5px; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
+    .dc-email { font-size: 14px; color: #aaa; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
+    
+    .dc-info-card { background-color: #201f23; border-radius: 16px; padding: 25px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .dc-faculty { font-size: 16px; font-weight: 600; margin-bottom: 15px; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
+    .dc-specialization { font-size: 16px; font-weight: 600; color: #ddd; line-height: 1.5; margin-bottom: 20px; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
+    .dc-divider { height: 1px; background-color: #3b3b3b; margin-bottom: 20px; }
+    .dc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .dc-label { font-size: 13px; color: #aaa; margin-bottom: 8px; }
+    .dc-val { font-size: 16px; font-weight: 600; -webkit-user-select: text; user-select: text; caret-color: #ff9800; outline: none; }
 </style>
 </head>
 <body>
@@ -281,7 +276,6 @@
             <div style="text-align: right;"></div>
         </div>
 
-        <!-- Repeated Cards as seen in screenshot -->
         <div class="announcement-card">
             <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
             <div>
@@ -309,21 +303,6 @@
             <div class="announcement-footer">
                 <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                 <span>Publish date: 09.07.2026 11:43</span>
-            </div>
-        </div>
-        
-        <div class="announcement-card">
-            <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
-            <div>
-                Vă anunțăm ca s-a afișat Programarea restanțelor și reexaminărilor TOAMNĂ 2026 pe site-ul facultății la secțiunea Programarea examenelor.<br>
-                <a class="announcement-link">mecanica.unitbv.ro/images/studenti/examene/2026.09/Sesiune_restante_si_reexaminari_toamna_2026.pdf</a><br>
-                <a class="announcement-link">mecanica.unitbv.ro/ro/studenti/programarea-examenelor.html</a>
-                Vă rugăm sa verificați frecvent pe site deoarece există posibilitatea ca până în septembrie să se mai modifice unele date de examene, ore, sali. Pentru fiecare cadru didactic există 2 date de examen. Vă rugăm sa țineți cont de această planificare și nu de cea de pe intranet unde se trece doar o singură dată de examen în vederea generării catalogului de note.<br>
-                Secretar șef Ing. Andreea Nuț
-            </div>
-            <div class="announcement-footer">
-                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                <span>Publish date: 09.07.2026 11:37</span>
             </div>
         </div>
     </div>
@@ -448,10 +427,61 @@
         </div>
     </div>
 
+
+    <!-- ================= DIGITAL CARD VIEW ================= -->
+    <div id="digital-card-wrapper" class="page-view">
+        <div class="page-header" style="margin-bottom: 40px;">
+            <div style="text-align: left;"><span class="back-btn" onclick="openPage('dashboard-view', 'back')">‹</span></div>
+            <div style="text-align: center; font-size: 19px;">Digital Card</div>
+            <div style="text-align: right;"><span style="font-size: 20px; font-weight: 600; color: #fff; background: #2a2a2a; border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;">?</span></div>
+        </div>
+
+        <div class="dc-univ-header">
+            <div class="dc-logo-box">
+                <div class="dc-logo-line"></div>
+                <div class="dc-logo-bars">
+                    <div></div><div></div><div></div><div></div>
+                </div>
+            </div>
+            <span>Transilvania University of Brasov</span>
+        </div>
+
+        <div class="dc-profile">
+            <div class="dc-avatar">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8"></path>
+                </svg>
+            </div>
+            <div class="dc-user-info">
+                <div class="dc-name" contenteditable="true">Antonio-Adrian Staicu</div>
+                <div class="dc-email" contenteditable="true">antonio.staicu@student.unitbv.ro</div>
+            </div>
+        </div>
+
+        <div class="dc-info-card">
+            <div class="dc-faculty" contenteditable="true">Facultatea de Inginerie Mecanică</div>
+            <div class="dc-specialization" contenteditable="true">Autovehicule rutiere- în limba engleză<br>Licenta, Year II</div>
+            <div class="dc-divider"></div>
+            <div class="dc-grid">
+                <div>
+                    <div class="dc-label">Group</div>
+                    <div class="dc-val" contenteditable="true">1LF742</div>
+                </div>
+                <div>
+                    <div class="dc-label">Registration number</div>
+                    <div class="dc-val" contenteditable="true">1LF724036</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Persistent Bottom Navigation -->
     <div class="bottom-nav">
         <svg onclick="openPage('dashboard-view', 'back')" class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        <div class="center-fab"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
+        <div class="center-fab" onclick="openPage('digital-card-wrapper', 'forward')">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
         <div style="width: 24px;"></div>
     </div>
 
@@ -464,7 +494,7 @@
     // --- PAGE ROUTER ---
     function openPage(pageId, direction) {
         window.activePage = pageId;
-        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper', 'announcements-wrapper'];
+        const pages = ['dashboard-view', 'results-wrapper', 'schedule-wrapper', 'fees-wrapper', 'announcements-wrapper', 'digital-card-wrapper'];
         pages.forEach(id => {
             const el = document.getElementById(id);
             el.style.display = 'none';
@@ -515,6 +545,8 @@
                 } else if (window.activePage === 'schedule-wrapper') {
                     if (scheduleIndex > 0) setScheduleDay(scheduleIndex - 1);
                     else openPage('dashboard-view', 'back');
+                } else if (window.activePage === 'digital-card-wrapper') {
+                    openPage('dashboard-view', 'back');
                 }
             } 
             
