@@ -279,7 +279,7 @@
             <div style="text-align: center; font-size: 18px;">Secretariat Announcements</div>
             <div style="text-align: right;"></div>
         </div>
-        <!-- Same as before -->
+        
         <div class="announcement-card">
             <div class="announcement-title">RESTANTE SI REEXAMINARI - TOAMNA 2026</div>
             <div>
@@ -379,15 +379,11 @@
 
             <!-- SEMESTER 1 -->
             <div class="semester-title">Semester 1</div>
-            <div class="course-list" id="semester-1-list">
-                <!-- Javascript will render these, but adding one here for structure clarity -->
-            </div>
+            <div class="course-list" id="semester-1-list"></div>
             
             <!-- SEMESTER 2 -->
             <div class="semester-title">Semester 2</div>
-            <div class="course-list" id="semester-2-list">
-                <!-- Javascript will render these -->
-            </div>
+            <div class="course-list" id="semester-2-list"></div>
         </div>
 
         <div id="view-scores" style="display: none;">
@@ -608,17 +604,24 @@
     }
 
     const sem1 = [
-        { grade: "7", name: "Rezistența materialelor I", markDesc: "7 (Șapte)", date: "02.02.2026", credits: "5" },
-        { grade: "8", name: "Matematici speciale și teoria prob...", markDesc: "8 (Opt)", date: "29.01.2026", credits: "4" }
+        { grade: "AB", name: "Rezistența materialelor I", markDesc: "Absent", date: "02.02.2026", credits: "5" },
+        { grade: "8", name: "Matematici speciale și teoria probabilităților și statistică matematică", markDesc: "8 (Opt)", date: "29.01.2026", credits: "4" },
+        { grade: "AD", name: "Educație fizică și sport III", markDesc: "Admis", date: "15.01.2026", credits: "1" },
+        { grade: "6", name: "Electronică aplicată", markDesc: "6 (Șase)", date: "20.01.2026", credits: "4" },
+        { grade: "7", name: "Economie generală", markDesc: "7 (Șapte)", date: "25.01.2026", credits: "3" },
+        { grade: "7", name: "Mecanică II", markDesc: "7 (Șapte)", date: "22.01.2026", credits: "4" },
+        { grade: "9", name: "Limba franceză 3", markDesc: "9 (Nouă)", date: "12.01.2026", credits: "2" },
+        { grade: "9", name: "Desen tehnic și infografică II", markDesc: "9 (Nouă)", date: "18.01.2026", credits: "4" }
     ];
 
     const sem2 = [
-        { grade: "AB", name: "Practica de domeniu", markDesc: "Absent", date: "10.09.2026", credits: "4", expanded: true },
         { grade: "AB", name: "Mecanisme", markDesc: "Absent", date: "10.09.2026", credits: "5" },
         { grade: "AB", name: "Mecanica fluidelor și mașini hidraulice", markDesc: "Absent", date: "10.09.2026", credits: "5" },
         { grade: "AB", name: "Rezistența materialelor II", markDesc: "Absent", date: "10.09.2026", credits: "4" },
         { grade: "5", name: "Organe de mașini I", markDesc: "5 (Cinci)", date: "03.09.2026", credits: "5" },
-        { grade: "AD", name: "Educație fizică și sport IV", markDesc: "Admis", date: "02.06.2026", credits: "1" }
+        { grade: "AD", name: "Educație fizică și sport IV", markDesc: "Admis", date: "02.06.2026", credits: "1" },
+        { grade: "8", name: "Toleranțe și control dimensional", markDesc: "8 (Opt)", date: "05.06.2026", credits: "4" },
+        { grade: "7", name: "Limba franceză 4", markDesc: "7 (Șapte)", date: "08.06.2026", credits: "2" }
     ];
 
     document.getElementById('semester-1-list').innerHTML = sem1.map(c => renderCourse(c)).join('');
